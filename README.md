@@ -7,4 +7,4 @@ A fast and secure decentralised exchange built for THORChain.
 
 Read the [Whitepaper](https://github.com/thorchain/Resources/blob/master/Whitepapers/ASGARDEX/whitepaper-en.md)
 
-
+See [`gui/README.md`](https://github.com/thorchain/ASGARDEX/blob/master/gui/README.md) for details on how to develop and build the GUI.
