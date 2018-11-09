@@ -1,26 +1,53 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2
 jobs:
-  build:
+  gui-lint:
     docker:
-      # specify the version
-      - image: circleci/golang:1.9
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    #### TEMPLATE_NOTE: go expects specific checkout path representing url
-    #### expecting it in the form of
-    ####   /go/src/github.com/circleci/go-tool
-    ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/thorchain/ASGARDEX
+      - image: circleci/node:10-stretch-browsers-legacy
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "gui/yarn.lock" }}
+      - run:
+          command: yarn install
+          working_directory: ~/project/gui
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "gui/yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+      - run:
+          command: yarn lint
+          working_directory: ~/project/gui
+  gui-test:
+    docker:
+      - image: circleci/node:10-stretch-browsers-legacy
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "gui/yarn.lock" }}
+      - run:
+          command: yarn install
+          working_directory: ~/project/gui
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "gui/yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
 
-      # specify any bash command here prefixed with `run: `
-      - run: go get -v -t -d ./...
-      - run: go test -v ./...
+      - run:
+          command: yarn build
+          working_directory: ~/project/gui
+
+      - run:
+          command: yarn run test
+          working_directory: ~/project/gui
+workflows:
+  version: 2
+  asgardex:
+    jobs:
+      - gui-lint
+      - gui-test
