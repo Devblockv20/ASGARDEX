@@ -23,6 +23,9 @@ jobs:
   gui-test:
     docker:
       - image: circleci/node:10-stretch-browsers-legacy
+    environment:
+      REACT_APP_API_HOST: https://thorchain.info/api
+      REACT_APP_LCD_API_HOST: https://thorchain.info/lcd
     steps:
       - checkout
       - restore_cache:
@@ -43,7 +46,7 @@ jobs:
           working_directory: ~/project/gui
 
       - run:
-          command: yarn run test
+          command: yarn test
           working_directory: ~/project/gui
 workflows:
   version: 2
