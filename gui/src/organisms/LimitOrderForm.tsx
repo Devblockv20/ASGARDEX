@@ -13,11 +13,7 @@ interface IProps {
 export const LimitOrderForm = ({ buy }: IProps) => (
   <>
     <H2>{buy ? 'Buy' : 'Sell'}</H2>
-    <FormRow style={{ marginTop: 3 }}>
-      <ColLabel />
-      <ColInput><BodyText style={{ opacity: 0.56 }}>Available: {buy ? '34,000 RUNE' : '1.0 BTC'}</BodyText></ColInput>
-    </FormRow>
-    <FormRow style={{ marginTop: 18 }}>
+    <FormRow style={{ marginTop: 41 }}>
       <ColLabel><BodyText>Price:</BodyText></ColLabel>
       <ColInput>
         <Input style={inputTickerAdditionPaddingWide} />
@@ -29,6 +25,13 @@ export const LimitOrderForm = ({ buy }: IProps) => (
       <ColInput>
         <Input style={inputTickerAdditionPadding} />
         <InputTickerAddition>{buy ? 'RUNE' : 'BTC'}</InputTickerAddition>
+      </ColInput>
+    </FormRow>
+    <FormRow style={{ marginTop: 12 }}>
+      <ColLabel><BodyText>Total:</BodyText></ColLabel>
+      <ColInput>
+        <Input style={inputTickerAdditionPadding} />
+        <InputTickerAddition>{buy ? 'BTC' : 'RUNE'}</InputTickerAddition>
         <InputRadioButtonGroup>
           <InputRadioButton active={buy} style={{ flex: '1 0 60px', margin: '0 5px' }}>25%</InputRadioButton>
           <InputRadioButton style={{ flex: '1 0 60px', margin: '0 5px' }}>50%</InputRadioButton>
@@ -37,12 +40,11 @@ export const LimitOrderForm = ({ buy }: IProps) => (
         </InputRadioButtonGroup>
       </ColInput>
     </FormRow>
-    <FormRow style={{ marginTop: 12 }}>
-      <ColLabel><BodyText>Total:</BodyText></ColLabel>
-      <ColInput>
-        <Input style={inputTickerAdditionPadding} />
-        <InputTickerAddition>{buy ? 'BTC' : 'RUNE'}</InputTickerAddition>
-      </ColInput>
+    <FormRow style={{ marginTop: 10 }}>
+      <ColLabel />
+      <ColInput style={{ textAlign: 'right' }}><BodyText style={{ opacity: 0.56 }}>
+        Of available: {buy ? '34,000 RUNE' : '1.0 BTC'}
+      </BodyText></ColInput>
     </FormRow>
     {buy ? <ButtonBuy>BUY BTC</ButtonBuy> : <ButtonSell>SELL BTC</ButtonSell>}
   </>
@@ -73,7 +75,7 @@ const ColInput = styled.div`
 `
 
 const ButtonBuy = styled.button`
-  margin-top: 39px;
+  margin-top: 22px;
   background: #00C486;
   border-radius: 5px;
   font-family: 'Exo 2';
