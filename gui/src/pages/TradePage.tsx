@@ -4,6 +4,7 @@ import { Col } from '../atoms/Col'
 import { Content } from '../atoms/Content'
 import { Layout } from '../atoms/Layout'
 import { Row } from '../atoms/Row'
+import { OrderbookContainer } from '../organisms/Orderbook/Container'
 import { PairInfoBar } from '../organisms/PairInfoBar'
 import { PlaceOrder } from '../organisms/PlaceOrder'
 import { TopNavbar } from '../organisms/TopNavbar'
@@ -30,7 +31,7 @@ export const TradePage = () => (
         </Col>
         <Col style={{ flex: '0 0 390px' }}>
           <Card style={{ flex: '1 0 auto' }}>
-            {/* <Orderbook /> */}
+            <OrderbookContainer priceDenom="RUNE" amountDenom="XMR" />
           </Card>
         </Col>
       </Row>
