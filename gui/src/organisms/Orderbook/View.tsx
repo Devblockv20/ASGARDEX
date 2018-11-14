@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import bars from './bars.svg'
 import { ICoin } from './ICoin'
-import { IOrderbook } from './IOrderbook'
+import { IOrder, IOrderbook, OrderKind } from './IOrderbook'
 
 interface IProps {
   buyOrderbook: IOrderbook
@@ -16,11 +16,7 @@ export const OrderbookView = ({ buyOrderbook, sellOrderbook }: IProps) => <Conta
     <Col>Total ({buyOrderbook.priceDenom})</Col>
   </Header>
   {sellOrderbook.orders && sellOrderbook.orders.reverse().map(order => (
-    <OrderLineSell key={order.order_id}>
-      <Col>{order.price.amount}</Col>
-      <Col>{order.amount.amount}</Col>
-      <Col>{Number(order.price.amount) * Number(order.amount.amount)}</Col>
-    </OrderLineSell>
+    <OrderLine key={order.order_id} order={order} />
   ))}
   <Live>
     <Col>{buyOrderbook.orders && buyOrderbook.orders[0].price.amount}</Col>
@@ -28,14 +24,16 @@ export const OrderbookView = ({ buyOrderbook, sellOrderbook }: IProps) => <Conta
     <Col><Icon src={bars} /></Col>
   </Live>
   {buyOrderbook.orders && buyOrderbook.orders.map(order => (
-    <OrderLineBuy key={order.order_id}>
-      <Col>{order.price.amount}</Col>
-      <Col>{order.amount.amount}</Col>
-      <Col>{Number(order.price.amount) * Number(order.amount.amount)}</Col>
-    </OrderLineBuy>
+    <OrderLine key={order.order_id} order={order} />
   ))}
 
 </Container>
+
+const OrderLine = ({ order }: { order: IOrder }) => <OrderLineRow kind={order.kind}>
+  <Col>{order.price.amount}</Col>
+  <Col>{order.amount.amount}</Col>
+  <Col>{Number(order.price.amount) * Number(order.amount.amount)}</Col>
+</OrderLineRow>
 
 const Container = styled.div`
 `
@@ -50,18 +48,12 @@ const Header = styled.div`
   padding: 15px 20px;
 `
 
-const OrderLineSell = styled(Header)`
+const OrderLineRow = styled(Header)<{ kind: OrderKind }>`
   opacity: 1;
   padding: 4px 20px;
 
   div:first-child {
-    color: #FE4764;
-  }
-`
-
-const OrderLineBuy = styled(OrderLineSell)`
-  div:first-child {
-    color: #00C486;
+    color: ${({ kind }) => kind === 1 ? '#00C486' : '#FE4764'};
   }
 `
 

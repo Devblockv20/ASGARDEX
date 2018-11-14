@@ -2,7 +2,7 @@ import { ICoin } from './ICoin'
 
 type BuyOrder = 1
 type SellOrder = 2
-type OrderKind = BuyOrder | SellOrder
+export type OrderKind = BuyOrder | SellOrder
 
 export interface IOrder {
   order_id: string,
