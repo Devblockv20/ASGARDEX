@@ -11,7 +11,7 @@ import { TopNavbar } from '../organisms/TopNavbar'
 
 export const TradePage = () => (
   <Layout>
-    <TopNavbar />
+    <TopNavbar page="trade"/>
     <Content>
       <PairInfoBar />
       <Row>
