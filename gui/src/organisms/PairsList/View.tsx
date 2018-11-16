@@ -16,14 +16,14 @@ export const PairsListView = observer(({ pairs }: IProps) => <Container>
     <Col>Change</Col>
   </Header>
   {pairs.map(pair => (
-    <PairLine key={pair.amountDenom + pair.priceDenom} pair={pair} />
+    <PairLine key={pair.id} pair={pair} />
   ))}
 </Container>)
 
 const PairLine = observer(({ pair }: { pair: IPair }) => <PairLineRow change={pair.ohlcv ? pair.ohlcv.change : 0}>
   <Col>{pair.amountDenom}/{pair.priceDenom}</Col>
   <Col>{pair.ohlcv && formatNum(pair.ohlcv.c, 8)}</Col>
-  <Col>{pair.ohlcv && formatPercent(pair.ohlcv.changePercent, 2)}</Col>
+  <Col>{pair.ohlcv && formatPercent(pair.ohlcv.changePercent, 2, true)}</Col>
 </PairLineRow>)
 
 const Container = styled.div`
