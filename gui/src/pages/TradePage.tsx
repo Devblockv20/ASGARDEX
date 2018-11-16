@@ -6,6 +6,7 @@ import { Layout } from '../atoms/Layout'
 import { Row } from '../atoms/Row'
 import { OrderbookContainer } from '../organisms/Orderbook/Container'
 import { PairInfoBar } from '../organisms/PairInfoBar'
+import { PairsListContainer } from '../organisms/PairsList/Container'
 import { PlaceOrder } from '../organisms/PlaceOrder'
 import { TopNavbar } from '../organisms/TopNavbar'
 
@@ -17,8 +18,8 @@ export const TradePage = () => (
       <Row>
         <Col style={{ flex: '0 0 390px' }}>
           <Card style={{ flex: '1 0 auto' }}>
-            {/* <PairsList />
-            <TradeHistory /> */}
+            <PairsListContainer />
+            {/* <TradeHistory /> */}
           </Card>
         </Col>
         <Col style={{ flex: '1 0 820px' }}>
