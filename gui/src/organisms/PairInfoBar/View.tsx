@@ -3,6 +3,8 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { formatPercent } from 'thorchain-info-common/build/helpers/formatPercent'
+import { ValueColored } from '../../atoms/ValueColored'
+import { getInUsd } from '../../helpers/getInUsd'
 import { IPair } from '../../store/Store'
 
 interface IProps {
@@ -38,6 +40,10 @@ const Container = styled.div`
 
   display: flex;
   align-items: center;
+
+  div:last-child {
+    margin-right: auto;
+  }
 `
 
 const Ticker = styled.div`
@@ -67,18 +73,6 @@ const SmallTitle = styled.div`
 const Value = styled.div`
 `
 
-const ValueColored = styled.span<{ change: number }>`
-  color: ${({ change }) => change > 0 ? '#00C486' : change < 0 ? '#FE4764' : 'white'};
-`
-
 const ValueSmall = styled.span`
   font-size: 18px;
 `
-
-// TODO replace with dynamic function by Haneef
-const getInUsd = (amount: number) => {
-  const ethPerRune = 1 / 12500
-  const usdPerEth = 204.43
-  const usd = amount * ethPerRune * usdPerEth
-  return usd
-}

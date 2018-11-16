@@ -1,15 +1,19 @@
+import { observer } from 'mobx-react'
 import * as React from 'react'
 import styled from 'styled-components'
+import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
+import { ValueColored } from '../../atoms/ValueColored'
+import { getInUsd } from '../../helpers/getInUsd'
+import { IOrder, IOrderbook, IPairOHLCV } from '../../store/Store'
 import bars from './bars.svg'
-import { ICoin } from './ICoin'
-import { IOrder, IOrderbook, OrderKind } from './IOrderbook'
 
 interface IProps {
   buyOrderbook: IOrderbook
   sellOrderbook: IOrderbook
+  ohlcv: IPairOHLCV
 }
 
-export const OrderbookView = ({ buyOrderbook, sellOrderbook }: IProps) => <Container>
+export const OrderbookView = observer(({ buyOrderbook, sellOrderbook, ohlcv }: IProps) => <Container>
   <Header>
     <Col>Price ({buyOrderbook.priceDenom})</Col>
     <Col>Amount ({buyOrderbook.amountDenom})</Col>
@@ -19,21 +23,20 @@ export const OrderbookView = ({ buyOrderbook, sellOrderbook }: IProps) => <Conta
     <OrderLine key={order.order_id} order={order} />
   ))}
   <Live>
-    <Col>{buyOrderbook.orders && buyOrderbook.orders[0].price.amount}</Col>
-    <Col>${buyOrderbook.orders && getInUsd(buyOrderbook.orders[0].price)}</Col>
+    <Col><ValueColored change={ohlcv.change}>{formatNum(ohlcv.c, 2)}</ValueColored></Col>
+    <Col>${formatNum(getInUsd(ohlcv.c), 2)}</Col>
     <Col><Icon src={bars} /></Col>
   </Live>
   {buyOrderbook.orders && buyOrderbook.orders.map(order => (
     <OrderLine key={order.order_id} order={order} />
   ))}
+</Container>)
 
-</Container>
-
-const OrderLine = ({ order }: { order: IOrder }) => <OrderLineRow kind={order.kind}>
-  <Col>{order.price.amount}</Col>
-  <Col>{order.amount.amount}</Col>
-  <Col>{Number(order.price.amount) * Number(order.amount.amount)}</Col>
-</OrderLineRow>
+const OrderLine = observer(({ order }: { order: IOrder }) => <OrderLineRow kind={order.kind}>
+  <Col>{formatNum(Number(order.price.amount), 2)}</Col>
+  <Col>{formatNum(Number(order.amount.amount), 6)}</Col>
+  <Col>{formatNum(Number(order.price.amount) * Number(order.amount.amount), 8)}</Col>
+</OrderLineRow>)
 
 const Container = styled.div`
 `
@@ -48,7 +51,7 @@ const Header = styled.div`
   padding: 15px 20px;
 `
 
-const OrderLineRow = styled(Header)<{ kind: OrderKind }>`
+const OrderLineRow = styled(Header)<{ kind: number }>`
   opacity: 1;
   padding: 4px 20px;
 
@@ -82,11 +85,3 @@ const Icon = styled.img`
   float: right;
   margin-top: 5px;
 `
-
-// TODO replace with dynamic function by Haneef
-const getInUsd = (coin: ICoin) => {
-  const ethPerRune = 1 / 12500
-  const usdPerEth = 204.43
-  const usd = parseInt(coin.amount, 10) * ethPerRune * usdPerEth
-  return usd.toFixed(2)
-}

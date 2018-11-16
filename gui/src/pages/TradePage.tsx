@@ -32,7 +32,7 @@ export const TradePage = () => (
         </Col>
         <Col style={{ flex: '0 0 390px' }}>
           <Card style={{ flex: '1 0 auto' }}>
-            <OrderbookContainer priceDenom="RUNE" amountDenom="XMR" />
+            <OrderbookContainer />
           </Card>
         </Col>
       </Row>

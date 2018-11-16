@@ -3,6 +3,32 @@ import { IExchangePair } from 'thorchain-info-common/src/interfaces/metrics'
 import { env } from '../helpers/env'
 import { http } from '../helpers/http'
 
+const Coin = types.model({
+  amount: types.string,
+  denom: types.string,
+})
+
+export interface ICoin extends Instance<typeof Coin> {}
+
+
+const Order = types.model({
+  amount: Coin,
+  kind: types.number,
+  order_id: types.identifier,
+  price: Coin,
+})
+
+export interface IOrder extends Instance<typeof Order> {}
+
+const Orderbook = types.model({
+  amountDenom: types.string,
+  kind: types.number,
+  orders: types.maybeNull(types.array(Order)),
+  priceDenom: types.string,
+})
+
+export interface IOrderbook extends Instance<typeof Orderbook> {}
+
 const PairOHLCV = types.model({
   c: types.number,
   h: types.number,
@@ -20,14 +46,18 @@ const PairOHLCV = types.model({
   },
 }))
 
+export interface IPairOHLCV extends Instance<typeof PairOHLCV> {}
+
 const Pair = types.model({
   amountDenom: types.string,
+  buyOrderbook: types.maybeNull(Orderbook),
   id: types.identifier,
   ohlcv: types.maybeNull(PairOHLCV),
   priceDenom: types.string,
+  sellOrderbook: types.maybeNull(Orderbook),
 })
 .actions(self => ({
-  fetch: flow(function* fetch() {
+  fetchOhlcv: flow(function* fetchOhlcv() {
     try {
       const result: IExchangePair = yield http.get(
         env.REACT_APP_API_HOST + `/exchange/pair/${self.priceDenom}/${self.amountDenom}`)
@@ -35,6 +65,22 @@ const Pair = types.model({
     } catch (error) {
       // tslint:disable-next-line:no-console
       console.error(`Failed to fetch pair ${self.amountDenom}/${self.priceDenom}`, error)
+    }
+  }),
+  fetchOrderboks: flow(function* fetchOrderboks() {
+    try {
+      const [buyOrderbook, sellOrderbook] = yield Promise.all([
+        http.post(env.REACT_APP_LCD_API_HOST + '/exchange/query-order-book',
+          { kind: 'buy', amount_denom: self.amountDenom, price_denom: self.priceDenom }),
+        http.post(env.REACT_APP_LCD_API_HOST + '/exchange/query-order-book',
+          { kind: 'sell', amount_denom: self.amountDenom, price_denom: self.priceDenom }),
+      ])
+
+      self.buyOrderbook = cast(buyOrderbook)
+      self.sellOrderbook = cast(sellOrderbook)
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to fetch orderbooks for ${self.amountDenom}/${self.priceDenom}`, error)
     }
   }),
 }))
@@ -49,15 +95,20 @@ export const Store = types.model({
   selectPair(pair: IPair) {
     self.pairSelected = cast(pair.id)
   },
-  subPairs() {
-    setInterval(() => {
-      self.pairs.map(pair => pair.fetch())
-    }, 1000)
+  sub() {
+    const fetch = () => {
+      self.pairs.map(pair => pair.fetchOhlcv())
+      self.pairSelected.fetchOrderboks()
+    }
+
+    setInterval(fetch, 1000)
+
+    fetch()
   },
 }))
 .actions(self => ({
   afterCreate() {
-    self.subPairs()
+    self.sub()
   },
 }))
 
