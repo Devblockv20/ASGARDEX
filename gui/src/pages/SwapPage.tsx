@@ -4,7 +4,7 @@ import { Col } from '../atoms/Col'
 import { Content } from '../atoms/Content'
 import { Layout } from '../atoms/Layout'
 import { Row } from '../atoms/Row'
-import { PlaceOrder } from '../organisms/PlaceOrder'
+import { CreateSwap } from '../organisms/CreateSwap'
 import { TopNavbar } from '../organisms/TopNavbar'
 
 export const SwapPage = () => (
@@ -14,7 +14,7 @@ export const SwapPage = () => (
       <Row>
         <Col style={{ flex: '1 0 820px' }}>
           <Card style={{ marginTop: 20 }}>
-            <PlaceOrder />
+            <CreateSwap />
           </Card>
         </Col>
       </Row>

@@ -45,6 +45,7 @@ export const TopNavbar = ({ page }: IProps) => (
   <Container>
     <Logos />
     <NavItems>
+      <NavItem selected={page === 'vote'}>Vote</NavItem>
       <Link to="/">
         <NavItem selected={page === 'trade'}>Trade</NavItem>
       </Link>
