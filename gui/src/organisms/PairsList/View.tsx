@@ -3,6 +3,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { formatPercent } from 'thorchain-info-common/build/helpers/formatPercent'
+import { ValueColored } from '../../atoms/ValueColored'
 import { IPair, IStore } from '../../store/Store'
 
 interface IProps {
@@ -22,10 +23,11 @@ export const PairsListView = observer(({ store, store: { pairs } }: IProps) => <
 
 const PairLine = observer(({ pair, store: { selectPair } }: { pair: IPair, store: IStore }) =>
   // tslint:disable-next-line:jsx-no-lambda
-  <PairLineRow change={pair.ohlcv ? pair.ohlcv.change : 0} onClick={() => selectPair(pair)}>
+  <PairLineRow onClick={() => selectPair(pair)}>
     <Col>{pair.amountDenom}/{pair.priceDenom}</Col>
     <Col>{pair.ohlcv && formatNum(pair.ohlcv.c, 8)}</Col>
-    <Col>{pair.ohlcv && formatPercent(pair.ohlcv.changePercent, 2, true)}</Col>
+    <Col><ValueColored change={pair.ohlcv ? pair.ohlcv.change : 0}>
+      {pair.ohlcv && formatPercent(pair.ohlcv.changePercent, 2, true)}</ValueColored></Col>
   </PairLineRow>,
 )
 
@@ -44,7 +46,7 @@ const Header = styled.div`
   padding: 15px 20px;
 `
 
-const PairLineRow = styled.button<{ change: number }>`
+const PairLineRow = styled.button`
   background: transparent;
   appearance: none;
   border: none;
@@ -67,7 +69,6 @@ const PairLineRow = styled.button<{ change: number }>`
   }
 
   div:last-child {
-    color: ${({ change }) => change > 0 ? '#00C486' : change < 0 ? '#FE4764' : 'white'};
     text-align: right;
   }
 `

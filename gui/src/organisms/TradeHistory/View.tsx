@@ -24,6 +24,7 @@ const TradeLine = observer(({ trade }: { trade: ITrade }) => <TradeLineRow>
 </TradeLineRow>)
 
 const Container = styled.div`
+  padding-bottom: 8px;
 `
 
 const Header = styled.div`
