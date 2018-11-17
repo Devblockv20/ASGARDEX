@@ -44,6 +44,7 @@ const Container = styled.div`
 
 const Ticker = styled.div`
   margin-right: 29px;
+  flex: 0 0 auto;
 
   font-size: 22px;
   letter-spacing: 0.77px;
@@ -55,6 +56,7 @@ const TickerPriceDenom = styled.span`
 `
 
 const Col = styled.div`
+  flex: 0 0 auto;
   margin-right: 58px;
 `
 

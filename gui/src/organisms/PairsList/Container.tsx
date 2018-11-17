@@ -11,10 +11,10 @@ interface IProps {
 @observer
 export class PairsListContainer extends React.Component<IProps, object> {
   public render() {
-    const { pairs } = this.props.store!
+    const { store } = this.props
 
-    if (!pairs) { return null }
+    if (!store!.pairs) { return null }
 
-    return <PairsListView pairs={pairs} />
+    return <PairsListView store={store!} />
   }
 }
