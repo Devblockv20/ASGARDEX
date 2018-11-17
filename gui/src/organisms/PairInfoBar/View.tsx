@@ -40,14 +40,9 @@ const Container = styled.div`
 
   display: flex;
   align-items: center;
-
-  div:last-child {
-    margin-right: auto;
-  }
 `
 
 const Ticker = styled.div`
-  flex: 1 0 auto;
   margin-right: 29px;
 
   font-size: 22px;
@@ -60,7 +55,6 @@ const TickerPriceDenom = styled.span`
 `
 
 const Col = styled.div`
-  flex: 1 0 auto;
   margin-right: 58px;
 `
 

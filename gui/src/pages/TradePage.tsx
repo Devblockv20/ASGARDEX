@@ -9,6 +9,7 @@ import { PairInfoBarContainer } from '../organisms/PairInfoBar/Container'
 import { PairsListContainer } from '../organisms/PairsList/Container'
 import { PlaceOrder } from '../organisms/PlaceOrder'
 import { TopNavbar } from '../organisms/TopNavbar'
+import { TradeHistoryContainer } from '../organisms/TradeHistory/Container'
 
 export const TradePage = () => (
   <Layout>
@@ -19,7 +20,7 @@ export const TradePage = () => (
         <Col style={{ flex: '0 0 390px' }}>
           <Card style={{ flex: '1 0 auto' }}>
             <PairsListContainer />
-            {/* <TradeHistory /> */}
+            <TradeHistoryContainer />
           </Card>
         </Col>
         <Col style={{ flex: '1 0 820px' }}>

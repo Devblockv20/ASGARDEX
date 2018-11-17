@@ -68,6 +68,7 @@ const Live = styled.div`
   display: flex;
   padding: 10px 20px;
   background: #747B8110;
+  margin: 8px 0;
 
   font-family: "Open Sans";
   font-size: 20px;

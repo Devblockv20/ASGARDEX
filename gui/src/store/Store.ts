@@ -29,6 +29,21 @@ const Orderbook = types.model({
 
 export interface IOrderbook extends Instance<typeof Orderbook> {}
 
+const Trade = types.model({
+  amount: types.number,
+  price: types.number,
+})
+.views(self => ({
+  get key () {
+    return self.amount + '/' + self.price
+  },
+  get volume () {
+    return self.amount * self.price
+  },
+}))
+
+export interface ITrade extends Instance<typeof Trade> {}
+
 const PairOHLCV = types.model({
   c: types.number,
   h: types.number,
@@ -55,6 +70,7 @@ const Pair = types.model({
   ohlcv: types.maybeNull(PairOHLCV),
   priceDenom: types.string,
   sellOrderbook: types.maybeNull(Orderbook),
+  trades: types.maybeNull(types.array(Trade)),
 })
 .actions(self => ({
   fetchOhlcv: flow(function* fetchOhlcv() {
@@ -83,6 +99,16 @@ const Pair = types.model({
       console.error(`Failed to fetch orderbooks for ${self.amountDenom}/${self.priceDenom}`, error)
     }
   }),
+  fetchTrades: flow(function* fetchTrades() {
+    try {
+      const result: IExchangePair = yield http.get(
+        env.REACT_APP_API_HOST + `/exchange/trades/${self.priceDenom}/${self.amountDenom}`)
+      self.trades = cast(result)
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to fetch trades ${self.amountDenom}/${self.priceDenom}`, error)
+    }
+  }),
 }))
 
 export interface IPair extends Instance<typeof Pair> {}
@@ -99,6 +125,7 @@ export const Store = types.model({
     const fetch = () => {
       self.pairs.map(pair => pair.fetchOhlcv())
       self.pairSelected.fetchOrderboks()
+      self.pairSelected.fetchTrades()
     }
 
     setInterval(fetch, 1000)
