@@ -2,9 +2,9 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
+import { Coin } from '../atoms/Coin'
+import { InputRadioButton } from '../atoms/InputRadioButton'
 import tokens from '../helpers/tokens'
-import { Coin } from './Coin'
-import { InputRadioButton } from './InputRadioButton'
 
 interface IProps {
   type: string,
@@ -14,7 +14,7 @@ interface IProps {
   onPercentageSelectClick?: (percentage:number) => void
 }
 
-export const TokenAmountDisplay = ({
+export const TokenExchangeAmountDisplay = ({
    type,
    amount,
    dollarsExchangeRate,

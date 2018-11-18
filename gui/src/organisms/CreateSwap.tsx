@@ -1,9 +1,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Coin } from '../atoms/Coin'
-import { TokenAmountDisplay } from '../atoms/TokenAmountDisplay'
 import swapDivider from '../images/swap_divider.png'
 import swapDivider2x from '../images/swap_divider@2x.png'
+import { TokenExchangeAmountDisplay } from './TokenExchangeAmountDisplay'
+import { TokenReceiveAmountDisplay } from './TokenReceiveAmountDisplay'
 
 interface IState {
   selectedReceiveToken: string,
@@ -112,7 +113,7 @@ export class CreateSwap extends React.Component<{}, IState> {
             <SwapHeader>
               Exchange
             </SwapHeader>
-            <TokenAmountDisplay
+            <TokenExchangeAmountDisplay
               type={selectedExchangeToken}
               amount={selectedExchangeAmount}
               dollarsExchangeRate={5545.91}
@@ -133,9 +134,12 @@ export class CreateSwap extends React.Component<{}, IState> {
             <SwapHeader>
               Receive
             </SwapHeader>
-            <TokenAmountDisplay
-              type={selectedReceiveToken}
-              amount={10}
+            <TokenReceiveAmountDisplay
+              type={selectedExchangeToken}
+              amount={selectedExchangeAmount * (selectedExchangePercentage / 100)}
+              dollarsExchangeRate={5545.91}
+              receiveExchangeRate={3.2}
+              receiveType={selectedReceiveToken}
             />
           </SwapWrapper>
         </Col>
@@ -203,6 +207,7 @@ const ImgDivider = styled.img`
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 40px;
 `
 
 const CoinWrapper = styled.div`
