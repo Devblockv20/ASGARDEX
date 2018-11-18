@@ -5,6 +5,161 @@ import { TokenAmountDisplay } from '../atoms/TokenAmountDisplay'
 import swapDivider from '../images/swap_divider.png'
 import swapDivider2x from '../images/swap_divider@2x.png'
 
+interface IState {
+  selectedReceiveToken: string,
+  selectedExchangeAmount: number,
+  selectedExchangeToken: string,
+  selectedExchangePercentage: number
+}
+
+export class CreateSwap extends React.Component<{}, IState> {
+  public state = {
+    selectedExchangeAmount: 0.1,
+    selectedExchangePercentage: 100,
+    selectedExchangeToken: 'BTC',
+    selectedReceiveToken: 'ETH',
+  }
+
+  constructor(props:object) {
+    super(props)
+    this.handleExchangePercentageClick = this.handleExchangePercentageClick.bind(this)
+  }
+
+  public handleExchangeTokenClick(selectedExchangeToken:string, selectedExchangeAmount:number) {
+    this.setState({
+      selectedExchangeAmount,
+      selectedExchangeToken,
+    })
+  }
+
+  public handleReceiveTokenClick(selectedReceiveToken:string) {
+    this.setState({
+      selectedReceiveToken,
+    })
+  }
+
+  public handleExchangePercentageClick(selectedExchangePercentage:number) {
+    this.setState({
+      selectedExchangePercentage,
+    })
+  }
+
+  public render() {
+    const {
+      selectedExchangeAmount,
+      selectedExchangePercentage,
+      selectedExchangeToken,
+      selectedReceiveToken,
+    } = this.state
+
+    // TODO replace with real wallet info
+    const walletTokens = [
+      {
+        amount: '0.1',
+        denom: 'BTC',
+      },
+      {
+        amount: '10',
+        denom: 'ETH',
+      },
+      {
+        amount: '10',
+        denom: 'LTC',
+      },
+      {
+        amount: '100',
+        denom: 'XMR',
+      },
+    ]
+
+    // TODO replace with real token info
+    const exchangeTokens = [
+      { denom: 'BTC' },
+      { denom: 'ETH' },
+      { denom: 'LTC' },
+      { denom: 'XMR' },
+      { denom: 'DSH' },
+      { denom: 'BCH' },
+      { denom: 'USDT' },
+      { denom: 'ZIL' },
+    ]
+
+    return (
+      <>
+      <Row>
+        <Col>
+          <WalletWrapper>
+            <Header>
+              Your Wallet
+            </Header>
+            {walletTokens.map((token) => (
+              <CoinWrapper>
+                <Coin
+                  type={token.denom}
+                  selected={selectedExchangeToken === token.denom}
+                  style={{ marginRight: 10 }}
+                  onClick={this.handleExchangeTokenClick.bind(this, token.denom, Number(token.amount))}
+                />
+                <CoinAmount>
+                  {token.amount} {token.denom}
+                </CoinAmount>
+              </CoinWrapper>
+            ))}
+          </WalletWrapper>
+        </Col>
+        <Col>
+          <SwapWrapper>
+            <SwapHeader>
+              Exchange
+            </SwapHeader>
+            <TokenAmountDisplay
+              type={selectedExchangeToken}
+              amount={selectedExchangeAmount}
+              dollarsExchangeRate={5545.91}
+              selectedPercentage={selectedExchangePercentage}
+              onPercentageSelectClick={this.handleExchangePercentageClick}
+            />
+          </SwapWrapper>
+        </Col>
+        <Col>
+          <ImgDivider
+            src={swapDivider}
+            srcSet={`${swapDivider} 1x, ${swapDivider2x} 2x`}
+            alt="Divider"
+          />
+        </Col>
+        <Col>
+          <SwapWrapper>
+            <SwapHeader>
+              Receive
+            </SwapHeader>
+            <TokenAmountDisplay
+              type={selectedReceiveToken}
+              amount={10}
+            />
+          </SwapWrapper>
+        </Col>
+        <Col>
+          <TokensWrapper>
+            <Header>
+              Tokens
+            </Header>
+            {exchangeTokens.map((token) => (
+              <Coin
+                type={token.denom}
+                selected={selectedReceiveToken === token.denom}
+                style={{ display: 'block', marginLeft: 'auto', marginBottom: 10 }}
+                onClick={this.handleReceiveTokenClick.bind(this, token.denom)}
+              />
+            ))}
+          </TokensWrapper>
+        </Col>
+      </Row>
+      </>
+    )
+  }
+}
+
 const Header = styled.h2`
   font-size: 20px;
   font-weight: 500;
@@ -63,127 +218,3 @@ const CoinAmount = styled.span`
   position: relative;
   top: 2px;
 `
-
-interface IState {
-  selectedReceiveToken: string,
-  selectedExchangeToken: string,
-  selectedExchangeAmount: number
-}
-
-export class CreateSwap extends React.Component<{}, IState> {
-  public state = { selectedReceiveToken: 'ETH', selectedExchangeToken: 'BTC', selectedExchangeAmount: 0 }
-
-  public handleExchangeTokenClick(selectedExchangeToken:string, selectedExchangeAmount:number) {
-    this.setState({
-      selectedExchangeAmount,
-      selectedExchangeToken,
-    })
-  }
-
-  public handleReceiveTokenClick(selectedReceiveToken:string) {
-    this.setState({
-      selectedReceiveToken,
-    })
-  }
-
-  public render() {
-    const { selectedReceiveToken, selectedExchangeToken } = this.state
-
-    // TODO replace with real wallet info
-    const walletTokens = [
-      {
-        amount: '0.1',
-        denom: 'BTC',
-      },
-      {
-        amount: '10',
-        denom: 'ETH',
-      },
-      {
-        amount: '10',
-        denom: 'LTC',
-      },
-      {
-        amount: '100',
-        denom: 'XMR',
-      },
-    ]
-
-    // TODO replace with real token info
-    const exchangeTokens = [
-      { denom: 'BTC' },
-      { denom: 'ETH' },
-      { denom: 'LTC' },
-      { denom: 'XMR' },
-      { denom: 'DSH' },
-      { denom: 'BCH' },
-      { denom: 'USDT' },
-      { denom: 'ZIL' },
-    ]
-
-    return (
-      <>
-      <Row>
-        <Col>
-          <WalletWrapper>
-            <Header>
-              Your Wallet
-            </Header>
-            {walletTokens.map((token) => (
-              <CoinWrapper>
-                <Coin
-                  type={token.denom}
-                  selected={selectedExchangeToken === token.denom}
-                  style={{ marginRight: 10 }}
-                  onClick={this.handleExchangeTokenClick.bind(this, token.denom, token.amount)}
-                />
-                <CoinAmount>
-                  {token.amount} {token.denom}
-                </CoinAmount>
-              </CoinWrapper>
-            ))}
-          </WalletWrapper>
-        </Col>
-        <Col>
-          <SwapWrapper>
-            <SwapHeader>
-              Exchange
-            </SwapHeader>
-            <TokenAmountDisplay type={selectedExchangeToken} amount={10}/>
-          </SwapWrapper>
-        </Col>
-        <Col>
-          <ImgDivider
-            src={swapDivider}
-            srcSet={`${swapDivider} 1x, ${swapDivider2x} 2x`}
-            alt="Divider"
-          />
-        </Col>
-        <Col>
-          <SwapWrapper>
-            <SwapHeader>
-              Receive
-            </SwapHeader>
-            <TokenAmountDisplay type={selectedReceiveToken} amount={10}/>
-          </SwapWrapper>
-        </Col>
-        <Col>
-          <TokensWrapper>
-            <Header>
-              Tokens
-            </Header>
-            {exchangeTokens.map((token) => (
-              <Coin
-                type={token.denom}
-                selected={selectedReceiveToken === token.denom}
-                style={{ display: 'block', marginLeft: 'auto', marginBottom: 10 }}
-                onClick={this.handleReceiveTokenClick.bind(this, token.denom)}
-              />
-            ))}
-          </TokensWrapper>
-        </Col>
-      </Row>
-      </>
-    )
-  }
-}
