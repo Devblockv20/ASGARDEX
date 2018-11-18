@@ -3126,6 +3126,12 @@ hoist-non-react-statics@^2.5.0:
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
 
+hoist-non-react-statics@^3.0.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.1.0.tgz#42414ccdfff019cd2168168be998c7b3bd5245c0"
+  dependencies:
+    react-is "^16.3.2"
+
 home-or-tmp@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/home-or-tmp/-/home-or-tmp-2.0.0.tgz#e36c3f2d2cae7d746a857e38d18d5f32a7882db8"
@@ -4603,19 +4609,19 @@ mkdirp@0.5.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
     minimist "0.0.8"
 
 mobx-react@^5.2.5:
-  version "5.2.5"
-  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-5.2.5.tgz#fc44ac17e1798f6b590f064b831d8a1d89850ef0"
+  version "5.3.6"
+  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-5.3.6.tgz#0bead0173aed7d12ace4981b53c28db4d61de9ef"
   dependencies:
-    hoist-non-react-statics "^2.5.0"
+    hoist-non-react-statics "^3.0.0"
     react-lifecycles-compat "^3.0.2"
 
 mobx-state-tree@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-3.1.1.tgz#7c021ed13b511522c0f66986c0532d938c684ea7"
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-3.7.1.tgz#161fc1b46224d3defa28b482914d3aa8e1b80ed7"
 
 mobx@^5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.0.3.tgz#53b97f2a0f9b0dd7774c96249f81bf2d513d8e1c"
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.6.0.tgz#e381c357e0ed7685a99a896455ecc66ff5ab84ee"
 
 moment@*, moment@^2.22.2:
   version "2.22.2"
@@ -4637,8 +4643,8 @@ ms@2.0.0:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
 mst-middlewares@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/mst-middlewares/-/mst-middlewares-3.1.1.tgz#80b7dcb24b4878e1b1b2f5fb61565e3ad8b64f14"
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/mst-middlewares/-/mst-middlewares-3.7.1.tgz#d25d0faa6e5d9f12985ad84625f0b2bdebd3448d"
 
 multicast-dns-service-types@^1.1.0:
   version "1.1.0"
@@ -5719,6 +5725,10 @@ react-error-overlay@^4.0.0:
 react-is@^16.3.1:
   version "16.4.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.4.2.tgz#84891b56c2b6d9efdee577cc83501dfc5ecead88"
+
+react-is@^16.3.2:
+  version "16.6.3"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.6.3.tgz#d2d7462fcfcbe6ec0da56ad69047e47e56e7eac0"
 
 react-lifecycles-compat@^3.0.2:
   version "3.0.4"
@@ -6803,6 +6813,10 @@ test-exclude@^4.2.1:
 text-table@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
+
+thorchain-info-common@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/thorchain-info-common/-/thorchain-info-common-0.10.0.tgz#d4157ad215a708ed4b6cabd82bca3da8087948b8"
 
 throat@^4.0.0:
   version "4.1.0"
