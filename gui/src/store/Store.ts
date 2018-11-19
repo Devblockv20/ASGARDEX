@@ -43,6 +43,12 @@ const Trade = types.model({
 
 export interface ITrade extends Instance<typeof Trade> {}
 
+// variable names in this model are in line with TradingView:
+// c: closing price
+// h: highest price
+// l: lowest price
+// o: opening price
+// v: volume
 const PairOHLCV = types.model({
   c: types.number,
   h: types.number,
