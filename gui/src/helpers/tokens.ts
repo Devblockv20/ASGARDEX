@@ -26,12 +26,12 @@ const tokens = {
     },
     name: 'Bitcoin',
   },
-  'DSH': {
+  'DASH': {
     colorImage: {
       '1x': require('../images/coins/coins_dash_color.png'),
       '2x': require('../images/coins/coins_dash_color@2x.png'),
     },
-    denom: 'DSH',
+    denom: 'DASH',
     greyImage: {
       '1x': require('../images/coins/coins_dash_grey.png'),
       '2x': require('../images/coins/coins_dash_grey@2x.png'),

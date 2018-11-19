@@ -10,7 +10,6 @@ const Coin = types.model({
 
 export interface ICoin extends Instance<typeof Coin> {}
 
-
 const Order = types.model({
   amount: Coin,
   kind: types.number,
@@ -113,13 +112,67 @@ const Pair = types.model({
 
 export interface IPair extends Instance<typeof Pair> {}
 
+
+const Price = types.model({
+  price: types.number,
+  symbol: types.string,
+})
+
+export interface IPrice extends Instance<typeof Price> {}
+
 export const Store = types.model({
   pairSelected: types.reference(Pair),
   pairs: types.array(Pair),
+  prices: types.array(Price),
 })
 .actions(self => ({
   selectPair(pair: IPair) {
     self.pairSelected = cast(pair.id)
+  },
+  fetchPrices: flow(function* fetchPrices() {
+    try {
+      const prices: [IPrice] = yield http.get(
+        `${env.REACT_APP_API_HOST}/swap/prices`,
+      )
+      self.prices = cast(prices.map(price => ({ symbol: price.symbol, price: Number(price.price) })))
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to fetch prices`, error)
+    }
+  }),
+  getTokenPriceInUsd(amount: number, denom: string) {
+    const pricesData = self.prices
+
+    if (!pricesData) {
+      return 0
+    }
+
+    let BTCtoUSDT
+    let denomToBTC
+
+    if (denom === 'USDT') {
+      return 1
+    }
+
+    for (const price of pricesData) {
+      if (price.symbol === `${denom}USDT`) {
+        return amount * price.price
+      }
+
+      if (price.symbol === `${denom}BTC`) {
+        denomToBTC = price.price
+      }
+
+      if (price.symbol === 'BTCUSDT') {
+        BTCtoUSDT = price.price
+      }
+    }
+
+    if (BTCtoUSDT && denomToBTC) {
+      return amount * denomToBTC * BTCtoUSDT
+    }
+
+    return 0
   },
   sub() {
     const fetch = () => {

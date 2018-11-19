@@ -1,11 +1,17 @@
+import { inject, observer } from 'mobx-react'
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { Coin } from '../atoms/Coin'
 import swapDivider from '../images/swap_divider.png'
 import swapDivider2x from '../images/swap_divider@2x.png'
+import { IStore } from '../store/Store'
 import { SummaryWrapper, SwapSummary } from './SwapSummary'
 import { TokenExchangeAmountDisplay } from './TokenExchangeAmountDisplay'
 import { TokenReceiveAmountDisplay } from './TokenReceiveAmountDisplay'
+
+interface IProps {
+  store?: IStore
+}
 
 interface IState {
   selectedExchangeAmount: number | null,
@@ -14,7 +20,9 @@ interface IState {
   selectedReceiveToken: string | null,
 }
 
-export class CreateSwap extends React.Component<{}, IState> {
+@inject('store')
+@observer
+export class CreateSwap extends React.Component<IProps, IState> {
   public state = {
     selectedExchangeAmount: null,
     selectedExchangePercentage: 100,
@@ -22,8 +30,9 @@ export class CreateSwap extends React.Component<{}, IState> {
     selectedReceiveToken: null,
   }
 
-  constructor(props:object) {
+  constructor(props:IProps) {
     super(props)
+    props.store!.fetchPrices()
     this.handleExchangePercentageClick = this.handleExchangePercentageClick.bind(this)
   }
 
@@ -54,6 +63,8 @@ export class CreateSwap extends React.Component<{}, IState> {
       selectedReceiveToken,
     } = this.state
 
+    const { getTokenPriceInUsd } = this.props.store!
+
     // TODO replace with real wallet info
     const walletTokens = [
       {
@@ -74,14 +85,13 @@ export class CreateSwap extends React.Component<{}, IState> {
       },
     ]
 
-    // TODO replace with real token info
-    const exchangeTokens = [
+    const exchangeTokensToRender = [
       { denom: 'BTC' },
       { denom: 'ETH' },
       { denom: 'LTC' },
       { denom: 'XMR' },
-      { denom: 'DSH' },
-      { denom: 'BCH' },
+      { denom: 'DASH' },
+      // { denom: 'BCH' }, TODO uncomment when hard fork of BCH has been resolved
       { denom: 'USDT' },
       { denom: 'ZIL' },
     ]
@@ -97,7 +107,7 @@ export class CreateSwap extends React.Component<{}, IState> {
               Your Wallet
             </Header>
             {walletTokens.map((token) => (
-              <CoinWrapper>
+              <CoinWrapper key={token.denom}>
                 <Coin
                   type={token.denom}
                   selected={selectedExchangeToken === token.denom}
@@ -122,7 +132,7 @@ export class CreateSwap extends React.Component<{}, IState> {
                   <TokenExchangeAmountDisplay
                     type={selectedExchangeToken}
                     amount={selectedExchangeAmount || 0}
-                    dollarsExchangeRate={5545.91}
+                    dollarsExchangeRate={getTokenPriceInUsd(1, selectedExchangeToken)}
                     selectedPercentage={selectedExchangePercentage}
                     onPercentageSelectClick={this.handleExchangePercentageClick}
                   />
@@ -150,7 +160,7 @@ export class CreateSwap extends React.Component<{}, IState> {
                   <TokenReceiveAmountDisplay
                     type={selectedExchangeToken || ''}
                     amount={totalExchangeAmount}
-                    dollarsExchangeRate={5545.91}
+                    dollarsExchangeRate={getTokenPriceInUsd(1, selectedReceiveToken)}
                     receiveExchangeRate={3.2}
                     receiveType={selectedReceiveToken}
                   />
@@ -171,8 +181,8 @@ export class CreateSwap extends React.Component<{}, IState> {
                   receiveType={selectedReceiveToken}
                   exchangeAmount={totalExchangeAmount}
                   receiveAmount={totalExchangeAmount * 3.2}
-                  dollarsExchangeAmount={totalExchangeAmount * 5545.91}
-                  dollarsReceiveAmount={totalExchangeAmount * 3.2 * 5545.91}
+                  dollarsExchangeAmount={getTokenPriceInUsd(totalExchangeAmount, selectedExchangeToken)}
+                  dollarsReceiveAmount={getTokenPriceInUsd(totalExchangeAmount * 3.2, selectedReceiveToken)}
                 />
               )}
               {(!selectedExchangeToken || !selectedReceiveToken) && (
@@ -187,8 +197,9 @@ export class CreateSwap extends React.Component<{}, IState> {
             <Header>
               Tokens
             </Header>
-            {exchangeTokens.map((token) => (
+            {exchangeTokensToRender.map((token) => (
               <Coin
+                key={token.denom}
                 type={token.denom}
                 selected={selectedReceiveToken === token.denom}
                 style={{ display: 'block', marginLeft: 'auto', marginBottom: 10 }}
