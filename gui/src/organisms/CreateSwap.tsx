@@ -98,6 +98,9 @@ export class CreateSwap extends React.Component<IProps, IState> {
 
     const totalExchangeAmount = (selectedExchangeAmount || 0) * (selectedExchangePercentage / 100)
 
+    // TODO replace this with real data from CLPs
+    const tokenExchangeRate = 3.2
+
     return (
       <>
       <Row>
@@ -161,7 +164,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
                     type={selectedExchangeToken || ''}
                     amount={totalExchangeAmount}
                     dollarsExchangeRate={getTokenPriceInUsd(1, selectedReceiveToken)}
-                    receiveExchangeRate={3.2}
+                    receiveExchangeRate={tokenExchangeRate}
                     receiveType={selectedReceiveToken}
                   />
                 )}
@@ -180,9 +183,11 @@ export class CreateSwap extends React.Component<IProps, IState> {
                   exchangeType={selectedExchangeToken}
                   receiveType={selectedReceiveToken}
                   exchangeAmount={totalExchangeAmount}
-                  receiveAmount={totalExchangeAmount * 3.2}
+                  receiveAmount={totalExchangeAmount * tokenExchangeRate}
                   dollarsExchangeAmount={getTokenPriceInUsd(totalExchangeAmount, selectedExchangeToken)}
-                  dollarsReceiveAmount={getTokenPriceInUsd(totalExchangeAmount * 3.2, selectedReceiveToken)}
+                  dollarsReceiveAmount={
+                    getTokenPriceInUsd(totalExchangeAmount * tokenExchangeRate, selectedReceiveToken)
+                  }
                 />
               )}
               {(!selectedExchangeToken || !selectedReceiveToken) && (
