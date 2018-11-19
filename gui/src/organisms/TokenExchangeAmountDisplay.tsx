@@ -102,7 +102,7 @@ export const TokenExchangeAmountDisplay = ({
 
 const Wrapper = styled.div`
   min-height: 250px;
-  min-width: 280px;
+  min-width: 320px;
   margin-top: 30px;
   display: block;
   position: relative;

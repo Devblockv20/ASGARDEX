@@ -1,24 +1,25 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Coin } from '../atoms/Coin'
 import swapDivider from '../images/swap_divider.png'
 import swapDivider2x from '../images/swap_divider@2x.png'
+import { SummaryWrapper, SwapSummary } from './SwapSummary'
 import { TokenExchangeAmountDisplay } from './TokenExchangeAmountDisplay'
 import { TokenReceiveAmountDisplay } from './TokenReceiveAmountDisplay'
 
 interface IState {
-  selectedReceiveToken: string,
-  selectedExchangeAmount: number,
-  selectedExchangeToken: string,
-  selectedExchangePercentage: number
+  selectedExchangeAmount: number | null,
+  selectedExchangePercentage: number,
+  selectedExchangeToken: string | null,
+  selectedReceiveToken: string | null,
 }
 
 export class CreateSwap extends React.Component<{}, IState> {
   public state = {
-    selectedExchangeAmount: 0.1,
+    selectedExchangeAmount: null,
     selectedExchangePercentage: 100,
-    selectedExchangeToken: 'BTC',
-    selectedReceiveToken: 'ETH',
+    selectedExchangeToken: null,
+    selectedReceiveToken: null,
   }
 
   constructor(props:object) {
@@ -85,6 +86,8 @@ export class CreateSwap extends React.Component<{}, IState> {
       { denom: 'ZIL' },
     ]
 
+    const totalExchangeAmount = (selectedExchangeAmount || 0) * (selectedExchangePercentage / 100)
+
     return (
       <>
       <Row>
@@ -109,39 +112,75 @@ export class CreateSwap extends React.Component<{}, IState> {
           </WalletWrapper>
         </Col>
         <Col>
-          <SwapWrapper>
-            <SwapHeader>
-              Exchange
-            </SwapHeader>
-            <TokenExchangeAmountDisplay
-              type={selectedExchangeToken}
-              amount={selectedExchangeAmount}
-              dollarsExchangeRate={5545.91}
-              selectedPercentage={selectedExchangePercentage}
-              onPercentageSelectClick={this.handleExchangePercentageClick}
-            />
-          </SwapWrapper>
-        </Col>
-        <Col>
-          <ImgDivider
-            src={swapDivider}
-            srcSet={`${swapDivider} 1x, ${swapDivider2x} 2x`}
-            alt="Divider"
-          />
-        </Col>
-        <Col>
-          <SwapWrapper>
-            <SwapHeader>
-              Receive
-            </SwapHeader>
-            <TokenReceiveAmountDisplay
-              type={selectedExchangeToken}
-              amount={selectedExchangeAmount * (selectedExchangePercentage / 100)}
-              dollarsExchangeRate={5545.91}
-              receiveExchangeRate={3.2}
-              receiveType={selectedReceiveToken}
-            />
-          </SwapWrapper>
+          <Row>
+            <Col>
+              <SwapWrapper>
+                <SwapHeader>
+                  Exchange
+                </SwapHeader>
+                {selectedExchangeToken && (
+                  <TokenExchangeAmountDisplay
+                    type={selectedExchangeToken}
+                    amount={selectedExchangeAmount || 0}
+                    dollarsExchangeRate={5545.91}
+                    selectedPercentage={selectedExchangePercentage}
+                    onPercentageSelectClick={this.handleExchangePercentageClick}
+                  />
+                )}
+                {!selectedExchangeToken && (
+                  <EmptyState>
+                    Select a token from your wallet.
+                  </EmptyState>
+                )}
+              </SwapWrapper>
+            </Col>
+            <Col>
+              <ImgDivider
+                src={swapDivider}
+                srcSet={`${swapDivider} 1x, ${swapDivider2x} 2x`}
+                alt="Divider"
+              />
+            </Col>
+            <Col>
+              <SwapWrapper>
+                <SwapHeader>
+                  Receive
+                </SwapHeader>
+                {selectedReceiveToken && (
+                  <TokenReceiveAmountDisplay
+                    type={selectedExchangeToken || ''}
+                    amount={totalExchangeAmount}
+                    dollarsExchangeRate={5545.91}
+                    receiveExchangeRate={3.2}
+                    receiveType={selectedReceiveToken}
+                  />
+                )}
+                {!selectedReceiveToken && (
+                  <EmptyState>
+                    Select a token to receive.
+                  </EmptyState>
+                )}
+              </SwapWrapper>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              {selectedExchangeToken && selectedReceiveToken && (
+                <SwapSummary
+                  exchangeType={selectedExchangeToken}
+                  receiveType={selectedReceiveToken}
+                  exchangeAmount={totalExchangeAmount}
+                  receiveAmount={totalExchangeAmount * 3.2}
+                  dollarsExchangeAmount={totalExchangeAmount * 5545.91}
+                  dollarsReceiveAmount={totalExchangeAmount * 3.2 * 5545.91}
+                />
+              )}
+              {(!selectedExchangeToken || !selectedReceiveToken) && (
+                <SummaryWrapper/>
+              )}
+              <SwapButton disabled={(!selectedExchangeToken || !selectedReceiveToken)}>Swap</SwapButton>
+            </Col>
+          </Row>
         </Col>
         <Col>
           <TokensWrapper>
@@ -222,4 +261,34 @@ const CoinWrapper = styled.div`
 const CoinAmount = styled.span`
   position: relative;
   top: 2px;
+`
+
+const EmptyState = styled.div`
+  width: 320px;
+  height: 190px;
+  text-align: center;
+  padding-top: 75px;
+  font-size: 18px;
+`
+
+const SwapButton = styled.button`
+  border-radius: 5px;
+  height: 35px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  background-color: #1c2731;
+  text-transform: uppercase;
+  border: 1px solid #50e3c2;
+  font-family: 'Exo 2';
+  width: 160px;
+  color: #fff;
+  font-size: 18px;
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  cursor: pointer;
+  ${props => props.disabled && css`
+    border: 1px solid #4e6376;
+    color: #4e6376;
+  `}
 `

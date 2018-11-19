@@ -1,4 +1,3 @@
-// tslint:disable:jsx-no-lambda
 import * as React from 'react'
 import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
@@ -68,7 +67,7 @@ export const TokenReceiveAmountDisplay = ({
 
 const Wrapper = styled.div`
   min-height: 250px;
-  min-width: 280px;
+  min-width: 320px;
   margin-top: 30px;
   display: block;
   position: relative;
