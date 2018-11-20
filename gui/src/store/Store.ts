@@ -146,18 +146,18 @@ export const Store = types.model({
       console.error(`Failed to fetch prices`, error)
     }
   }),
-  getTokenPriceInUsd(amount: number, denom: string) {
+  getTokenPriceInUsdt(amount: number, denom: string) {
     const pricesData = self.prices
 
     if (!pricesData) {
-      return 0
+      return null
     }
 
     let BTCtoUSDT
     let denomToBTC
 
     if (denom === 'USDT') {
-      return 1
+      return amount
     }
 
     for (const price of pricesData) {
@@ -178,7 +178,7 @@ export const Store = types.model({
       return amount * denomToBTC * BTCtoUSDT
     }
 
-    return 0
+    return null
   },
   sub() {
     const fetch = () => {

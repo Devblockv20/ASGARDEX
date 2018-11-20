@@ -7,7 +7,7 @@ import tokens from '../helpers/tokens'
 interface IProps {
   type: string,
   amount: number,
-  dollarsExchangeRate?: number,
+  dollarsExchangeRate?: number | null,
   receiveExchangeRate?: number,
   receiveType: string,
 }
