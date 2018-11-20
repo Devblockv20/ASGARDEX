@@ -32,24 +32,26 @@ export class CreateSwap extends React.Component<IProps, IState> {
 
   constructor(props:IProps) {
     super(props)
+
+    // Fetch token prices every 5 seconds
     props.store!.fetchPrices()
-    this.handleExchangePercentageClick = this.handleExchangePercentageClick.bind(this)
+    setInterval(() => props.store!.fetchPrices(), 5000)
   }
 
-  public handleExchangeTokenClick(selectedExchangeToken:string, selectedExchangeAmount:number) {
+  public handleExchangeTokenClick = (selectedExchangeToken:string, selectedExchangeAmount:number) => () => {
     this.setState({
       selectedExchangeAmount,
       selectedExchangeToken,
     })
   }
 
-  public handleReceiveTokenClick(selectedReceiveToken:string) {
+  public handleReceiveTokenClick = (selectedReceiveToken:string) => () => {
     this.setState({
       selectedReceiveToken,
     })
   }
 
-  public handleExchangePercentageClick(selectedExchangePercentage:number) {
+  public handleExchangePercentageClick = (selectedExchangePercentage:number) => {
     this.setState({
       selectedExchangePercentage,
     })
@@ -63,7 +65,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
       selectedReceiveToken,
     } = this.state
 
-    const { getTokenPriceInUsd } = this.props.store!
+    const { getTokenPriceInUsdt } = this.props.store!
 
     // TODO replace with real wallet info
     const walletTokens = [
@@ -115,7 +117,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
                   type={token.denom}
                   selected={selectedExchangeToken === token.denom}
                   style={{ marginRight: 10 }}
-                  onClick={this.handleExchangeTokenClick.bind(this, token.denom, Number(token.amount))}
+                  onClick={this.handleExchangeTokenClick(token.denom, Number(token.amount))}
                 />
                 <CoinAmount>
                   {token.amount} {token.denom}
@@ -135,7 +137,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
                   <TokenExchangeAmountDisplay
                     type={selectedExchangeToken}
                     amount={selectedExchangeAmount || 0}
-                    dollarsExchangeRate={getTokenPriceInUsd(1, selectedExchangeToken)}
+                    dollarsExchangeRate={getTokenPriceInUsdt(1, selectedExchangeToken)}
                     selectedPercentage={selectedExchangePercentage}
                     onPercentageSelectClick={this.handleExchangePercentageClick}
                   />
@@ -163,7 +165,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
                   <TokenReceiveAmountDisplay
                     type={selectedExchangeToken || ''}
                     amount={totalExchangeAmount}
-                    dollarsExchangeRate={getTokenPriceInUsd(1, selectedReceiveToken)}
+                    dollarsExchangeRate={getTokenPriceInUsdt(1, selectedReceiveToken)}
                     receiveExchangeRate={tokenExchangeRate}
                     receiveType={selectedReceiveToken}
                   />
@@ -184,9 +186,9 @@ export class CreateSwap extends React.Component<IProps, IState> {
                   receiveType={selectedReceiveToken}
                   exchangeAmount={totalExchangeAmount}
                   receiveAmount={totalExchangeAmount * tokenExchangeRate}
-                  dollarsExchangeAmount={getTokenPriceInUsd(totalExchangeAmount, selectedExchangeToken)}
+                  dollarsExchangeAmount={getTokenPriceInUsdt(totalExchangeAmount, selectedExchangeToken)}
                   dollarsReceiveAmount={
-                    getTokenPriceInUsd(totalExchangeAmount * tokenExchangeRate, selectedReceiveToken)
+                    getTokenPriceInUsdt(totalExchangeAmount * tokenExchangeRate, selectedReceiveToken)
                   }
                 />
               )}
@@ -208,7 +210,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
                 type={token.denom}
                 selected={selectedReceiveToken === token.denom}
                 style={{ display: 'block', marginLeft: 'auto', marginBottom: 10 }}
-                onClick={this.handleReceiveTokenClick.bind(this, token.denom)}
+                onClick={this.handleReceiveTokenClick(token.denom)}
               />
             ))}
           </TokensWrapper>

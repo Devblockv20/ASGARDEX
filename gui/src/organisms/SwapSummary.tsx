@@ -9,8 +9,8 @@ interface IProps {
   receiveType: string
   exchangeAmount: number,
   receiveAmount: number,
-  dollarsExchangeAmount: number,
-  dollarsReceiveAmount: number,
+  dollarsExchangeAmount: number | null,
+  dollarsReceiveAmount: number | null,
 }
 
 export class SwapSummary extends React.Component<IProps, {}> {
@@ -35,7 +35,7 @@ export class SwapSummary extends React.Component<IProps, {}> {
               {formatNum(exchangeAmount, 4)} {exchangeType}
             </TokenExchangeAmount>
             <div>
-              ${formatNum(dollarsExchangeAmount)} USD
+              ${formatNum(dollarsExchangeAmount || 0)} USD
             </div>
           </InfoWrapper>
           <CoinWrapper>
@@ -57,7 +57,7 @@ export class SwapSummary extends React.Component<IProps, {}> {
               {formatNum(receiveAmount, 4)} {receiveType}
             </TokenReceiveAmount>
             <div>
-              ${formatNum(dollarsReceiveAmount)} USD
+              ${formatNum(dollarsReceiveAmount || 0)} USD
             </div>
           </InfoWrapper>
         </ReceiveSummary>

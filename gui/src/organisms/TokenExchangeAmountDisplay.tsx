@@ -9,7 +9,7 @@ import tokens from '../helpers/tokens'
 interface IProps {
   type: string,
   amount: number,
-  dollarsExchangeRate?: number,
+  dollarsExchangeRate?: number | null,
   selectedPercentage?: number,
   onPercentageSelectClick?: (percentage:number) => void
 }
