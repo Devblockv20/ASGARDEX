@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export const InputRadioButton = styled.button<{ active?: boolean }>`
   height: 35px;
@@ -11,9 +11,16 @@ export const InputRadioButton = styled.button<{ active?: boolean }>`
   color: white;
   width: 100%;
   box-sizing: border-box;
+  cursor: pointer;
+  ${props => props.active && css`
+    color: #50E3C2;
+  `}
 
   :hover, :focus {
     border: 1px solid #3D4E61;
     outline: none;
+    ${props => props.active && css`
+      border: 1px solid #50E3C2;
+    `}
   }
 `

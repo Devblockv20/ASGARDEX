@@ -10,6 +10,7 @@
     "mst-middlewares": "^3.1.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "react-router-dom": "^4.3.1",
     "react-scripts-ts": "2.17.0",
     "styled-components": "^3.4.2",
     "thorchain-info-common": "^0.10.0"
@@ -25,8 +26,9 @@
     "@types/jest": "^23.3.1",
     "@types/moment": "^2.13.0",
     "@types/node": "^10.5.8",
-    "@types/react": "^16.4.9",
-    "@types/react-dom": "^16.0.7",
+    "@types/react": "16.4.9",
+    "@types/react-dom": "^16.0.9",
+    "@types/react-router-dom": "^4.3.1",
     "remotedev": "^0.2.7",
     "typescript": "^3.0.1"
   }

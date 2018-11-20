@@ -13,7 +13,7 @@ import { TradeHistoryContainer } from '../organisms/TradeHistory/Container'
 
 export const TradePage = () => (
   <Layout>
-    <TopNavbar />
+    <TopNavbar page="trade"/>
     <Content>
       <PairInfoBarContainer />
       <Row>
