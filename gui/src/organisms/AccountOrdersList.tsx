@@ -62,4 +62,6 @@ export const AccountOrdersList = () => {
 
 const Wrapper = styled.div`
   padding: 20px;
+  padding-bottom: 40px;
+  min-height: 200px;
 `
