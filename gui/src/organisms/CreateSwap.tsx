@@ -3,6 +3,8 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Button } from '../atoms/Button'
 import { Coin } from '../atoms/Coin'
+import { SearchInput } from '../atoms/SearchInput'
+import tokens from '../helpers/tokens'
 import swapDivider from '../images/swap_divider.png'
 import swapDivider2x from '../images/swap_divider@2x.png'
 import { IStore } from '../store/Store'
@@ -19,6 +21,7 @@ interface IState {
   selectedExchangePercentage: number,
   selectedExchangeToken: string | null,
   selectedReceiveToken: string | null,
+  tokenSearchTerm: string,
 }
 
 @inject('store')
@@ -29,6 +32,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
     selectedExchangePercentage: 100,
     selectedExchangeToken: null,
     selectedReceiveToken: null,
+    tokenSearchTerm: '',
   }
 
   constructor(props:IProps) {
@@ -58,12 +62,19 @@ export class CreateSwap extends React.Component<IProps, IState> {
     })
   }
 
+  public handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({
+      tokenSearchTerm: event.target.value,
+    })
+  }
+
   public render() {
     const {
       selectedExchangeAmount,
       selectedExchangePercentage,
       selectedExchangeToken,
       selectedReceiveToken,
+      tokenSearchTerm,
     } = this.state
 
     const { getTokenPriceInUsdt } = this.props.store!
@@ -97,7 +108,17 @@ export class CreateSwap extends React.Component<IProps, IState> {
       // { denom: 'BCH' }, TODO uncomment when hard fork of BCH has been resolved
       { denom: 'USDT' },
       { denom: 'ZIL' },
-    ]
+    ].filter((token) => {
+      if (tokenSearchTerm === '') {
+        return true
+      }
+
+      const tokenData = tokens[token.denom]
+      const tokenName = tokenData ? tokenData.name.toUpperCase() : ''
+      const upperCaseSearchTerm = tokenSearchTerm.toUpperCase()
+
+      return token.denom.includes(upperCaseSearchTerm) || tokenName.includes(upperCaseSearchTerm)
+    })
 
     const totalExchangeAmount = (selectedExchangeAmount || 0) * (selectedExchangePercentage / 100)
 
@@ -197,6 +218,9 @@ export class CreateSwap extends React.Component<IProps, IState> {
                 <SummaryWrapper/>
               )}
               <SwapButton primary={true} disabled={(!selectedExchangeToken || !selectedReceiveToken)}>Swap</SwapButton>
+              <Disclaimer>
+                Swaps are executed at the best possible price against both the CLP and the order book.
+              </Disclaimer>
             </Col>
           </Row>
         </Col>
@@ -205,6 +229,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
             <Header>
               Tokens
             </Header>
+            <SearchInput onChange={this.handleSearchChange} value={tokenSearchTerm}/>
             {exchangeTokensToRender.map((token) => (
               <Coin
                 key={token.denom}
@@ -295,4 +320,12 @@ const SwapButton = styled(Button)`
   margin-right: auto;
   margin-top: 30px;
   display: block;
+`
+
+const Disclaimer = styled.div`
+  text-align: center;
+  font-family: 'Helvetica';
+  font-size: 12px;
+  color: #4e6376;
+  margin-top: 30px;
 `
