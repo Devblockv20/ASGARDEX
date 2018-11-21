@@ -37,6 +37,26 @@ const NavItem = styled<{ selected: boolean }, 'button'>('button')`
   `}
 `
 
+const AccountInfo = styled.div`
+  flex: 0;
+  height: 90px;
+  display: flex;
+  align-items: center;
+`
+
+const LoggedOut = styled.button`
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  letter-spacing: 1.1px;
+  color: #00c486;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+  height: 90px;
+  width: 180px;
+`
+
 interface IProps {
   page: string
 }
@@ -53,5 +73,10 @@ export const TopNavbar = ({ page }: IProps) => (
         <NavItem selected={page === 'swap'}>Swap</NavItem>
       </Link>
     </NavItems>
+    <AccountInfo>
+      <Link to="/account">
+        <LoggedOut>Add Wallet</LoggedOut>
+      </Link>
+    </AccountInfo>
   </Container>
 )

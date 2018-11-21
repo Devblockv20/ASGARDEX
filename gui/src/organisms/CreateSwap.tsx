@@ -1,6 +1,7 @@
 import { inject, observer } from 'mobx-react'
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
+import { Button } from '../atoms/Button'
 import { Coin } from '../atoms/Coin'
 import swapDivider from '../images/swap_divider.png'
 import swapDivider2x from '../images/swap_divider@2x.png'
@@ -195,7 +196,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
               {(!selectedExchangeToken || !selectedReceiveToken) && (
                 <SummaryWrapper/>
               )}
-              <SwapButton disabled={(!selectedExchangeToken || !selectedReceiveToken)}>Swap</SwapButton>
+              <SwapButton primary={true} disabled={(!selectedExchangeToken || !selectedReceiveToken)}>Swap</SwapButton>
             </Col>
           </Row>
         </Col>
@@ -289,24 +290,9 @@ const EmptyState = styled.div`
   font-size: 18px;
 `
 
-const SwapButton = styled.button`
-  border-radius: 5px;
-  height: 35px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-  background-color: #1c2731;
-  text-transform: uppercase;
-  border: 1px solid #50e3c2;
-  font-family: 'Exo 2';
-  width: 160px;
-  color: #fff;
-  font-size: 18px;
-  margin-top: 30px;
+const SwapButton = styled(Button)`
   margin-left: auto;
   margin-right: auto;
+  margin-top: 30px;
   display: block;
-  cursor: pointer;
-  ${props => props.disabled && css`
-    border: 1px solid #4e6376;
-    color: #4e6376;
-  `}
 `
