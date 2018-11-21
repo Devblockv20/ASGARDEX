@@ -75,7 +75,7 @@ export const TopNavbar = ({ page }: IProps) => (
     </NavItems>
     <AccountInfo>
       <Link to="/account">
-        <LoggedOut>Unlock Wallet</LoggedOut>
+        <LoggedOut>Add Wallet</LoggedOut>
       </Link>
     </AccountInfo>
   </Container>
