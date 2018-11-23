@@ -16,4 +16,7 @@ export const initialState: IStoreIn = {
     { amountDenom: 'ADA', id: 'ADA/RUNE', priceDenom: 'RUNE' },
     { amountDenom: 'LTC', id: 'LTC/RUNE', priceDenom: 'RUNE' },
   ],
+  tokens: {
+    RUNE: { decimals: 18, name: 'Rune', ticker: 'RUNE' },
+  },
 }

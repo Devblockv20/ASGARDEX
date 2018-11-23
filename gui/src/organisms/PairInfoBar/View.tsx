@@ -5,31 +5,55 @@ import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { formatPercent } from 'thorchain-info-common/build/helpers/formatPercent'
 import { ValueColored } from '../../atoms/ValueColored'
 import { getInUsd } from '../../helpers/getInUsd'
-import { IPair } from '../../store/Store'
+import { IPair, IStore } from '../../store/Store'
 
 interface IProps {
   pairSelected: IPair
+  naturalTokenToToken: IStore['naturalTokenToToken']
 }
 
-export const PairInfoBarView = observer(({ pairSelected: { amountDenom, priceDenom, ohlcv } }: IProps) => (
-  <Container>
-    <Ticker>{amountDenom}<TickerPriceDenom>/{priceDenom}</TickerPriceDenom></Ticker>
-    {ohlcv && (
-      <>
-        <Col><SmallTitle>Last Price</SmallTitle><Value>
-          <ValueColored change={ohlcv.change}>{formatNum(ohlcv.c, 2)}</ValueColored>{'   '}
-          <ValueSmall>${formatNum(getInUsd(ohlcv.c), 2)}</ValueSmall>
-        </Value></Col>
-        <Col><SmallTitle>24h Change</SmallTitle><Value><ValueColored change={ohlcv.change}>
-          {formatNum(ohlcv.change, 2)}{'   '}{formatPercent(ohlcv.changePercent, 2, true)}
-        </ValueColored></Value></Col>
-        <Col><SmallTitle>24h High</SmallTitle><Value>{formatNum(ohlcv.h, 2)}</Value></Col>
-        <Col><SmallTitle>24h Low</SmallTitle><Value>{formatNum(ohlcv.l, 2)}</Value></Col>
-        <Col><SmallTitle>24h Volume</SmallTitle><Value>{formatNum(ohlcv.v, 2)} {priceDenom}</Value></Col>
-      </>
-    )}
-  </Container>
-))
+export const PairInfoBarView = observer((
+  { pairSelected, pairSelected: { amountDenom, priceDenom, ohlcv }, naturalTokenToToken }: IProps) => {
+  return (
+    <Container>
+      <Ticker>{amountDenom}<TickerPriceDenom>/{priceDenom}</TickerPriceDenom></Ticker>
+      {ohlcv && <Ohlcv pairSelected={pairSelected} naturalTokenToToken={naturalTokenToToken} />}
+    </Container>
+  )
+})
+
+const Ohlcv = observer((
+  { pairSelected: { priceDenom, ohlcv }, naturalTokenToToken }: IProps) => {
+  const h = naturalTokenToToken(ohlcv!.h, priceDenom)
+  const l = naturalTokenToToken(ohlcv!.l, priceDenom)
+  const c = naturalTokenToToken(ohlcv!.c, priceDenom)
+  const v = naturalTokenToToken(ohlcv!.v, priceDenom)
+  const change = naturalTokenToToken(ohlcv!.change, priceDenom)
+
+  return (
+    <>
+      <Col><SmallTitle>Last Price</SmallTitle><Value>
+        <ValueColored change={change} title={formatNum(c)}>
+          {formatNum(c, 2)}
+        </ValueColored>
+        {'   '}
+        <ValueSmall>${formatNum(getInUsd(c), 2)}</ValueSmall>
+      </Value></Col>
+      <Col><SmallTitle>24h Change</SmallTitle><Value><ValueColored change={change}>
+        <span title={formatNum(change)}>
+          {formatNum(change, 2)}
+        </span>{'   '}
+        {formatPercent(ohlcv!.changePercent, 2, true)}
+      </ValueColored></Value></Col>
+      <Col><SmallTitle>24h High</SmallTitle><Value title={formatNum(h)}>
+        {formatNum(h, 2)}</Value></Col>
+      <Col><SmallTitle>24h Low</SmallTitle><Value title={formatNum(l)}>
+        {formatNum(l, 2)}</Value></Col>
+      <Col><SmallTitle>24h Volume</SmallTitle><Value title={formatNum(v)}>
+        {formatNum(v, 2)} {priceDenom}</Value></Col>
+    </>
+  )
+})
 
 const Container = styled.div`
   font-family: "Open Sans";

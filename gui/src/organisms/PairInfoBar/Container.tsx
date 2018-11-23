@@ -12,12 +12,12 @@ interface IProps {
 @observer
 export class PairInfoBarContainer extends React.Component<IProps, object> {
   public render() {
-    const { pairSelected } = this.props.store!
+    const { pairSelected, naturalTokenToToken } = this.props.store!
 
     if (!pairSelected) { return <Container /> }
 
     return <Container>
-      <PairInfoBarView pairSelected={pairSelected} />
+      <PairInfoBarView pairSelected={pairSelected} naturalTokenToToken={naturalTokenToToken} />
     </Container>
   }
 }

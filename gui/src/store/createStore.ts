@@ -1,5 +1,5 @@
 import { destroy } from 'mobx-state-tree'
-import { connectReduxDevtools } from 'mst-middlewares'
+// import { connectReduxDevtools } from 'mst-middlewares'
 import { IStore, Store } from './Store'
 
 
@@ -13,7 +13,7 @@ export function createStore(snapshot: any) {
   store = Store.create(snapshot)
 
   // connect devtools
-  connectReduxDevtools(require('remotedev'), store)
+  // connectReduxDevtools(require('remotedev'), store)
 
   return store
 }
