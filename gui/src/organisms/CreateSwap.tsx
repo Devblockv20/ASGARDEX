@@ -108,16 +108,16 @@ export class CreateSwap extends React.Component<IProps, IState> {
       // { denom: 'BCH' }, TODO uncomment when hard fork of BCH has been resolved
       { denom: 'USDT' },
       { denom: 'ZIL' },
-    ].filter((token) => {
+    ].filter((token, index) => {
       if (tokenSearchTerm === '') {
         return true
       }
 
       const tokenData = tokens[token.denom]
       const tokenName = tokenData ? tokenData.name.toUpperCase() : ''
-      const upperCaseSearchTerm = tokenSearchTerm.toUpperCase()
+      const searchTerm = tokenSearchTerm.toUpperCase()
 
-      return token.denom.includes(upperCaseSearchTerm) || tokenName.includes(upperCaseSearchTerm)
+      return token.denom.includes(searchTerm) || tokenName.includes(searchTerm) || Number(searchTerm) === index
     })
 
     const totalExchangeAmount = (selectedExchangeAmount || 0) * (selectedExchangePercentage / 100)
