@@ -17,6 +17,8 @@ const Image = styled<{ big: boolean, onClick?: ((event: React.MouseEvent<HTMLIma
   ${props => props.big && css`
     height: 80px;
     width: 80px;
+    margin-left: 15px;
+    margin-right: 15px;
   `}
   ${props => props.onClick && css`
     cursor: pointer;
