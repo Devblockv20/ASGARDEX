@@ -22,6 +22,7 @@ interface IState {
   selectedExchangeToken: string | null,
   selectedReceiveToken: string | null,
   tokenSearchTerm: string,
+  totalExchangeAmount: number,
 }
 
 @inject('store')
@@ -33,6 +34,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
     selectedExchangeToken: null,
     selectedReceiveToken: null,
     tokenSearchTerm: '',
+    totalExchangeAmount: 0,
   }
 
   constructor(props:IProps) {
@@ -47,6 +49,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
     this.setState({
       selectedExchangeAmount,
       selectedExchangeToken,
+      totalExchangeAmount: selectedExchangeAmount * (this.state.selectedExchangePercentage / 100),
     })
   }
 
@@ -59,6 +62,13 @@ export class CreateSwap extends React.Component<IProps, IState> {
   public handleExchangePercentageClick = (selectedExchangePercentage:number) => {
     this.setState({
       selectedExchangePercentage,
+      totalExchangeAmount: (this.state.selectedExchangeAmount || 0) * (selectedExchangePercentage / 100),
+    })
+  }
+
+  public handleTotalAmountChange = (totalExchangeAmount:number) => {
+    this.setState({
+      totalExchangeAmount,
     })
   }
 
@@ -70,11 +80,12 @@ export class CreateSwap extends React.Component<IProps, IState> {
 
   public render() {
     const {
-      selectedExchangeAmount,
       selectedExchangePercentage,
       selectedExchangeToken,
       selectedReceiveToken,
       tokenSearchTerm,
+      totalExchangeAmount,
+      selectedExchangeAmount,
     } = this.state
 
     const { getTokenPriceInUsdt } = this.props.store!
@@ -120,10 +131,11 @@ export class CreateSwap extends React.Component<IProps, IState> {
       return token.denom.includes(searchTerm) || tokenName.includes(searchTerm) || Number(searchTerm) === index
     })
 
-    const totalExchangeAmount = (selectedExchangeAmount || 0) * (selectedExchangePercentage / 100)
-
     // TODO replace this with real data from CLPs
     const tokenExchangeRate = 3.2
+
+    // Can't exchange more than you have in your wallet
+    const maxExchangeAmount = selectedExchangeAmount || 0
 
     return (
       <>
@@ -158,10 +170,12 @@ export class CreateSwap extends React.Component<IProps, IState> {
                 {selectedExchangeToken && (
                   <TokenExchangeAmountDisplay
                     type={selectedExchangeToken}
-                    amount={selectedExchangeAmount || 0}
-                    dollarsExchangeRate={getTokenPriceInUsdt(1, selectedExchangeToken)}
+                    totalExchangeAmount={totalExchangeAmount}
+                    maxExchangeAmount={maxExchangeAmount}
                     selectedPercentage={selectedExchangePercentage}
+                    dollarsExchangeRate={getTokenPriceInUsdt(1, selectedExchangeToken)}
                     onPercentageSelectClick={this.handleExchangePercentageClick}
+                    onTotalAmountChange={this.handleTotalAmountChange}
                   />
                 )}
                 {!selectedExchangeToken && (
