@@ -16,4 +16,5 @@ export const initialState: IStoreIn = {
     { amountDenom: 'ADA', id: 'ADA/RUNE', priceDenom: 'RUNE' },
     { amountDenom: 'LTC', id: 'LTC/RUNE', priceDenom: 'RUNE' },
   ],
+  thorchainClientLoaded: false,
 }

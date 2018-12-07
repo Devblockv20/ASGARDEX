@@ -1,7 +1,9 @@
 import { cast, flow, Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree'
 import { IExchangePair } from 'thorchain-info-common/src/interfaces/metrics'
+import { downloadFile } from '../helpers/downloadFile'
 import { env } from '../helpers/env'
 import { http } from '../helpers/http'
+import { loadThorchainClient } from '../helpers/loadThorchainClient'
 
 const Coin = types.model({
   amount: types.string,
@@ -124,16 +126,83 @@ const Price = types.model({
   symbol: types.string,
 })
 
+
+const Wallet = types.model({
+  address: types.string,
+  privateKey: types.string,
+  publicKey: types.string,
+})
+
 export interface IPrice extends Instance<typeof Price> {}
 
 export const Store = types.model({
   pairSelected: types.reference(Pair),
   pairs: types.array(Pair),
   prices: types.array(Price),
+  thorchainClientLoaded: types.boolean,
+  wallet: types.maybeNull(Wallet),
 })
 .actions(self => ({
   selectPair(pair: IPair) {
     self.pairSelected = cast(pair.id)
+  },
+  createWallet: flow(function* fetchPrices() {
+    try {
+      const { client } = yield loadThorchainClient()
+      const walletString = yield client.createKey()
+      const wallet = JSON.parse(String(walletString))
+
+      self.wallet = cast({
+        address: wallet.addr,
+        privateKey: wallet.priv,
+        publicKey: wallet.pub,
+      })
+
+      // Base-64 encode the data
+      const walletFileContents = btoa(String(walletString))
+
+      // Store & download new wallet file
+      window.localStorage.setItem('key.thorchain', walletFileContents)
+      downloadFile('key.thorchain', walletFileContents)
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to create wallet`, error)
+    }
+  }),
+  forgetWallet() {
+    window.localStorage.removeItem('key.thorchain')
+    self.wallet = null
+  },
+  loadWallet(walletFileContents?: string | null) {
+    let isStored = false
+
+    // Load wallet from local storage
+    if (!walletFileContents) {
+      walletFileContents = window.localStorage.getItem('key.thorchain')
+      isStored = true
+    }
+
+    if (!walletFileContents) {
+      return
+    }
+
+    try {
+      const wallet = JSON.parse(atob(walletFileContents))
+
+      self.wallet = cast({
+        address: wallet.addr,
+        privateKey: wallet.priv,
+        publicKey: wallet.pub,
+      })
+
+      // Store the wallet locally if it isn't already
+      if (!isStored) {
+        window.localStorage.setItem('key.thorchain', walletFileContents)
+      }
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to load wallet from localstorage`, error)
+    }
   },
   fetchPrices: flow(function* fetchPrices() {
     try {
@@ -180,6 +249,15 @@ export const Store = types.model({
 
     return null
   },
+  loadClient: flow(function* loadClient() {
+    try {
+      const { client } = yield loadThorchainClient()
+      self.thorchainClientLoaded = Boolean(client)
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to load up thorchain client`, error)
+    }
+  }),
   sub() {
     const fetch = () => {
       self.pairs.map(pair => pair.fetchOhlcv())
@@ -195,6 +273,8 @@ export const Store = types.model({
 .actions(self => ({
   afterCreate() {
     self.sub()
+    self.loadClient()
+    self.loadWallet()
   },
 }))
 

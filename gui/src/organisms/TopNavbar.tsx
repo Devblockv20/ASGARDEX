@@ -1,7 +1,44 @@
+import { inject, observer } from 'mobx-react'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 import { Logos } from '../atoms/Logos'
+import { IStore } from '../store/Store'
+
+interface IProps {
+  page: string,
+  store?: IStore
+}
+
+@inject('store')
+@observer
+export class TopNavbar extends React.Component<IProps, {}> {
+
+  public render() {
+    const { page, store } = this.props
+    const wallet = store!.wallet
+
+    return (
+      <Container>
+        <Logos />
+        <NavItems>
+          <NavItem selected={page === 'vote'}>Vote</NavItem>
+          <Link to="/">
+            <NavItem selected={page === 'trade'}>Trade</NavItem>
+          </Link>
+          <Link to="/swap">
+            <NavItem selected={page === 'swap'}>Swap</NavItem>
+          </Link>
+        </NavItems>
+        <AccountInfo>
+          <Link to="/account">
+            <LoggedOut>{wallet ? 'View Wallet' : 'Add Wallet'}</LoggedOut>
+          </Link>
+        </AccountInfo>
+      </Container>
+    )
+  }
+}
 
 const Container = styled.div`
   flex: 0;
@@ -56,27 +93,3 @@ const LoggedOut = styled.button`
   height: 90px;
   width: 180px;
 `
-
-interface IProps {
-  page: string
-}
-
-export const TopNavbar = ({ page }: IProps) => (
-  <Container>
-    <Logos />
-    <NavItems>
-      <NavItem selected={page === 'vote'}>Vote</NavItem>
-      <Link to="/">
-        <NavItem selected={page === 'trade'}>Trade</NavItem>
-      </Link>
-      <Link to="/swap">
-        <NavItem selected={page === 'swap'}>Swap</NavItem>
-      </Link>
-    </NavItems>
-    <AccountInfo>
-      <Link to="/account">
-        <LoggedOut>Add Wallet</LoggedOut>
-      </Link>
-    </AccountInfo>
-  </Container>
-)

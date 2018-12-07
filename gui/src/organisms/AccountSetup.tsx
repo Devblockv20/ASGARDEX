@@ -1,3 +1,4 @@
+import { inject, observer } from 'mobx-react'
 import * as React from 'react'
 import styled from 'styled-components'
 import { Button } from '../atoms/Button'
@@ -6,46 +7,109 @@ import { Header } from '../atoms/Header'
 import { Input } from '../atoms/Input'
 import { Label } from '../atoms/Label'
 import { Row } from '../atoms/Row'
+import { IStore } from '../store/Store'
 
-export const AccountSetup = () => (
-  <Wrapper>
-    <Header borderBottom={true}>Account</Header>
-    <Row>
-      <Col>
-        <Label>Token owner</Label>
-        <Input placeholder="Enter your private key"/>
-        <Label>or select wallet file</Label>
-        <Button>Select file</Button>
-        <Row style={{ marginTop: 20 }}>
-          <Col style={{ margin: 0 }}>
-            <Label>Name</Label>
-            <Text>My Wallet</Text>
-            <Label style={{ marginTop: 8 }}>Tokens</Label>
-            <Text>
-              10,000 RUNE
-            </Text>
-            <Text>
-              10 ETH
-            </Text>
-            <Text>
-              1 BTC
-            </Text>
+interface IProps {
+  store?: IStore
+}
+
+@inject('store')
+@observer
+export class AccountSetup extends React.Component<IProps, {}> {
+
+  private fileInputRef: any
+
+  public handleCreateAccountClick = () => {
+    const { store } = this.props
+    store!.createWallet()
+  }
+
+  public handleForgetAccountClick = () => {
+    const { store } = this.props
+    store!.forgetWallet()
+  }
+
+  public handleSelectFileClick = () => {
+    if (!this.fileInputRef) {
+      return
+    }
+
+    this.fileInputRef.click()
+  }
+
+  public handleFileUpload = (e: any) => {
+    const file = e.target.files[0]
+    const reader = new FileReader()
+
+    reader.onload = (readEvent: any) => {
+      const walletString = readEvent.target.result
+      const { store } = this.props
+      store!.loadWallet(walletString)
+    }
+
+    reader.readAsText(file)
+  }
+
+  public render() {
+    const { store } = this.props
+    const wallet = store!.wallet
+
+    return (
+      <Wrapper>
+        <Header borderBottom={true}>Account</Header>
+        <Row>
+          <Col>
+            <Label>Token owner</Label>
+            {/* Note: disabled for now, as we don't have a function to turn priv key -> pub key & address */}
+            <Input placeholder="Enter your private key (disabled for now)" disabled={true}/>
+            {!wallet && (
+              <React.Fragment>
+                <Label>or select wallet file</Label>
+                <Button onClick={this.handleSelectFileClick}>Select file</Button>
+                <input
+                  type="file"
+                  style={{ display: 'none' }}
+                  onChange={this.handleFileUpload}
+                  ref={(fileInput) => this.fileInputRef = fileInput}
+                />
+              </React.Fragment>
+            )}
+            <Row style={{ marginTop: 20 }}>
+              <Col style={{ margin: 0 }}>
+                <Label>Name</Label>
+                <Text>MY WALLET</Text>
+                <Label style={{ marginTop: 8 }}>Tokens</Label>
+                <Text>
+                  10,000 RUNE
+                </Text>
+                <Text>
+                  10 ETH
+                </Text>
+                <Text>
+                  1 BTC
+                </Text>
+              </Col>
+              <Col>
+                <Label>Address</Label>
+                <Text>{wallet ? wallet.address : 'NONE'}</Text>
+              </Col>
+            </Row>
           </Col>
           <Col>
-            <Label>Address</Label>
-            <Text>TOX12345.....ABCDEF</Text>
+            <Buttons>
+              {!wallet && (
+                <Button primary={true} onClick={this.handleCreateAccountClick}>Create account</Button>
+              )}
+              {wallet && (
+                <Button onClick={this.handleForgetAccountClick}>Forget account</Button>
+              )}
+            </Buttons>
           </Col>
         </Row>
-      </Col>
-      <Col>
-        <Buttons>
-          <Button primary={true}>Add account</Button>
-          <Button>Forget account</Button>
-        </Buttons>
-      </Col>
-    </Row>
-  </Wrapper>
-)
+      </Wrapper>
+    )
+  }
+}
 
 const Wrapper = styled.div`
   padding: 20px;
@@ -61,7 +125,6 @@ const Text = styled.p`
   font-size: 20px;
   letter-spacing: 1.5px;
   color: #fff;
-  text-transform: uppercase;
   margin-top: 0;
   margin-bottom: 10px;
 `
