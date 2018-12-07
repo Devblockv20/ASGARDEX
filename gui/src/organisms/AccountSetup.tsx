@@ -1,13 +1,14 @@
 import { inject, observer } from 'mobx-react'
 import * as React from 'react'
 import styled from 'styled-components'
+import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { Button } from '../atoms/Button'
 import { Col } from '../atoms/Col'
 import { Header } from '../atoms/Header'
 import { Input } from '../atoms/Input'
 import { Label } from '../atoms/Label'
 import { Row } from '../atoms/Row'
-import { IStore } from '../store/Store'
+import { ICoin, IStore } from '../store/Store'
 
 interface IProps {
   store?: IStore
@@ -79,15 +80,16 @@ export class AccountSetup extends React.Component<IProps, {}> {
                 <Label>Name</Label>
                 <Text>MY WALLET</Text>
                 <Label style={{ marginTop: 8 }}>Tokens</Label>
-                <Text>
-                  10,000 RUNE
-                </Text>
-                <Text>
-                  10 ETH
-                </Text>
-                <Text>
-                  1 BTC
-                </Text>
+                {wallet && wallet.coins.map((coin: ICoin) => (
+                  <Text key={coin.denom}>
+                    {formatNum(Number(coin.amount), 4)} {coin.denom}
+                  </Text>
+                ))}
+                {(!wallet || wallet.coins.length === 0) && (
+                  <Text>
+                    NONE
+                  </Text>
+                )}
               </Col>
               <Col>
                 <Label>Address</Label>

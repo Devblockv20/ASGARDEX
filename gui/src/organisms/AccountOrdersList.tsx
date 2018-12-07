@@ -19,7 +19,7 @@ const orders = [
     amount: 0.5,
     block: '123,456',
     denom: 'BTC',
-    hash: '0x1234...ABCD',
+    hash: '0x1234...WXYZ',
     price: 1000,
     time: new Date(),
     type: 'buy',
@@ -43,7 +43,7 @@ export const AccountOrdersList = () => (
       </TableHeader>
       <TableBody>
         {orders.map((order) => (
-          <TableRow>
+          <TableRow key={order.hash}>
             <TableCell>{order.type}</TableCell>
             <TableCell>{order.denom}</TableCell>
             <TableCell>{order.price}</TableCell>

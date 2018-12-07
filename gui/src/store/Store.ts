@@ -126,14 +126,34 @@ const Price = types.model({
   symbol: types.string,
 })
 
+export interface IPrice extends Instance<typeof Price> {}
 
 const Wallet = types.model({
   address: types.string,
+  coins: types.array(Coin),
   privateKey: types.string,
   publicKey: types.string,
 })
+.actions(self => ({
+  fetchCoins: flow(function* fetchCoins() {
+    try {
+      const account: any = yield http.get(
+        `${env.REACT_APP_LCD_API_HOST}/accounts/${self.address}`,
+      )
 
-export interface IPrice extends Instance<typeof Price> {}
+      if (!account) {
+        return
+      }
+
+      self.coins = cast(account.value.coins)
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to fetch wallet coins`, error)
+    }
+  }),
+}))
+
+export interface IWallet extends Instance<typeof Wallet> {}
 
 export const Store = types.model({
   pairSelected: types.reference(Pair),
@@ -154,6 +174,7 @@ export const Store = types.model({
 
       self.wallet = cast({
         address: wallet.addr,
+        coins: [],
         privateKey: wallet.priv,
         publicKey: wallet.pub,
       })
@@ -191,6 +212,7 @@ export const Store = types.model({
 
       self.wallet = cast({
         address: wallet.addr,
+        coins: [],
         privateKey: wallet.priv,
         publicKey: wallet.pub,
       })
@@ -198,6 +220,10 @@ export const Store = types.model({
       // Store the wallet locally if it isn't already
       if (!isStored) {
         window.localStorage.setItem('key.thorchain', walletFileContents)
+      }
+
+      if (self.wallet) {
+        self.wallet.fetchCoins()
       }
     } catch (error) {
       // tslint:disable-next-line:no-console

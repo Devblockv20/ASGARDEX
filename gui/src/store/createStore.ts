@@ -13,7 +13,9 @@ export function createStore(snapshot: any) {
   store = Store.create(snapshot)
 
   // connect devtools
-  connectReduxDevtools(require('remotedev'), store)
+  if ('__REDUX_DEVTOOLS_EXTENSION__' in window || 'devToolsExtension' in window) {
+    connectReduxDevtools(require('remotedev'), store)
+  }
 
   return store
 }
