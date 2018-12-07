@@ -81,6 +81,16 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
+"@types/webassembly-js-api@*":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@types/webassembly-js-api/-/webassembly-js-api-0.0.2.tgz#43a04bd75fa20332133c6c3986156bfeb4a3ced7"
+
+"@types/webassembly-web-api@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@types/webassembly-web-api/-/webassembly-web-api-0.0.1.tgz#4affed91f23c8cdeef8d1c6a5a3a5b603d693d5c"
+  dependencies:
+    "@types/webassembly-js-api" "*"
+
 abab@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.4.tgz#5faad9c2c07f60dd76770f71cf025b62a63cfd4e"
@@ -4683,10 +4693,6 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-mst-middlewares@^3.1.1:
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/mst-middlewares/-/mst-middlewares-3.7.1.tgz#d25d0faa6e5d9f12985ad84625f0b2bdebd3448d"
-
 multicast-dns-service-types@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/multicast-dns-service-types/-/multicast-dns-service-types-1.1.0.tgz#899f11d9686e5e05cb91b35d5f0e63b773cfc901"
@@ -6892,6 +6898,10 @@ text-table@0.2.0:
 thorchain-info-common@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/thorchain-info-common/-/thorchain-info-common-0.10.0.tgz#d4157ad215a708ed4b6cabd82bca3da8087948b8"
+
+thorchain-wasm-client@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/thorchain-wasm-client/-/thorchain-wasm-client-0.0.3.tgz#f165ec124f09412927a25ff2516c0e72c7ee4b23"
 
 throat@^4.0.0:
   version "4.1.0"

@@ -1,0 +1,1 @@
+../node_modules/thorchain-wasm-client/dist/wasm_exec.js
