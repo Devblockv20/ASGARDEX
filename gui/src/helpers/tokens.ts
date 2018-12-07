@@ -2,6 +2,12 @@
  * List of all tokens and associated useful info
  */
 const tokens = {
+  'ADA': {
+    colorImage: null,
+    denom: 'ADA',
+    greyImage: null,
+    name: 'ADA',
+  },
   'BCH': {
     colorImage: {
       '1x': require('../images/coins/coins_bitcoincash_color.png'),
@@ -26,6 +32,12 @@ const tokens = {
     },
     name: 'Bitcoin',
   },
+  'CAN': {
+    colorImage: null,
+    denom: 'CAN',
+    greyImage: null,
+    name: 'CanYaCoin',
+  },
   'DASH': {
     colorImage: {
       '1x': require('../images/coins/coins_dash_color.png'),
@@ -37,6 +49,12 @@ const tokens = {
       '2x': require('../images/coins/coins_dash_grey@2x.png'),
     },
     name: 'Dash',
+  },
+  'EOS': {
+    colorImage: null,
+    denom: 'EOS',
+    greyImage: null,
+    name: 'EOS',
   },
   'ETH': {
     colorImage: {
@@ -50,6 +68,12 @@ const tokens = {
     },
     name: 'Ethereum',
   },
+  'LOKI': {
+    colorImage: null,
+    denom: 'LOKI',
+    greyImage: null,
+    name: 'Loki',
+  },
   'LTC': {
     colorImage: {
       '1x': require('../images/coins/coins_litecoin_color.png'),
@@ -61,6 +85,12 @@ const tokens = {
       '2x': require('../images/coins/coins_litecoin_grey@2x.png'),
     },
     name: 'Litecoin',
+  },
+  'NEO': {
+    colorImage: null,
+    denom: 'NEO',
+    greyImage: null,
+    name: 'NEO',
   },
   'USDT': {
     colorImage: {
@@ -74,6 +104,12 @@ const tokens = {
     },
     name: 'USD Tether',
   },
+  'XEM': {
+    colorImage: null,
+    denom: 'XEM',
+    greyImage: null,
+    name: 'New Economy Movement',
+  },
   'XMR': {
     colorImage: {
       '1x': require('../images/coins/coins_monero_color.png'),
@@ -85,6 +121,12 @@ const tokens = {
       '2x': require('../images/coins/coins_monero_grey@2x.png'),
     },
     name: 'Monero',
+  },
+  'XRP': {
+    colorImage: null,
+    denom: 'XRP',
+    greyImage: null,
+    name: 'Ripple',
   },
   'ZIL': {
     colorImage: {
