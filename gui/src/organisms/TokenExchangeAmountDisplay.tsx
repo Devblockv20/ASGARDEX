@@ -157,25 +157,23 @@ export class TokenExchangeAmountDisplay extends React.Component<IProps, IState> 
             </InputRadioButton>
           </PercentageButtons>
         )}
-        {dollarsExchangeRate && (
-          <CalculatedAmounts>
-            <TokenAmountWrapper>
-              <InputAmount value={totalAmountString} onChange={this.handleTotalAmountChange}/>
-              <Denom>
-                {tokenData.denom}
-              </Denom>
-            </TokenAmountWrapper>
-            <Separator/>
-            <USDAmountWrapper>
-              <Amount>
-                ${formatNum(dollars)}
-              </Amount>
-              <Denom>
-                USD
-              </Denom>
-            </USDAmountWrapper>
-          </CalculatedAmounts>
-        )}
+        <CalculatedAmounts>
+          <TokenAmountWrapper>
+            <InputAmount value={totalAmountString} onChange={this.handleTotalAmountChange}/>
+            <Denom>
+              {tokenData.denom}
+            </Denom>
+          </TokenAmountWrapper>
+          <Separator/>
+          <USDAmountWrapper>
+            <Amount>
+              {dollarsExchangeRate ? `$${formatNum(dollars)}` : '?'}
+            </Amount>
+            <Denom>
+              USD
+            </Denom>
+          </USDAmountWrapper>
+        </CalculatedAmounts>
       </Wrapper>
     )
   }

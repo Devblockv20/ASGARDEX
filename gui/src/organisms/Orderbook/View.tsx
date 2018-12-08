@@ -4,7 +4,9 @@ import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { ValueColored } from '../../atoms/ValueColored'
 import { getInUsd } from '../../helpers/getInUsd'
-import { IOrder, IOrderbook, IPairOHLCV } from '../../store/Store'
+import { IOrder } from '../../store/Order'
+import { IOrderbook } from '../../store/Orderbook'
+import { IPairOHLCV } from '../../store/PairOHLCV'
 import bars from './bars.svg'
 
 interface IProps {

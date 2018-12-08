@@ -92,6 +92,12 @@ const tokens = {
     greyImage: null,
     name: 'NEO',
   },
+  'RUNE': {
+    colorImage: null,
+    denom: 'RUNE',
+    greyImage: null,
+    name: 'Rune',
+  },
   'USDT': {
     colorImage: {
       '1x': require('../images/coins/coins_tether_color.png'),

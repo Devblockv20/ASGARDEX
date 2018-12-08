@@ -2,7 +2,7 @@ import { observer } from 'mobx-react'
 import * as React from 'react'
 import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
-import { ITrade } from '../../store/Store'
+import { ITrade } from '../../store/Trade'
 
 interface IProps {
   trades: ITrade[]

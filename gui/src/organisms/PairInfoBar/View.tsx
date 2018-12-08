@@ -5,7 +5,7 @@ import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { formatPercent } from 'thorchain-info-common/build/helpers/formatPercent'
 import { ValueColored } from '../../atoms/ValueColored'
 import { getInUsd } from '../../helpers/getInUsd'
-import { IPair } from '../../store/Store'
+import { IPair } from '../../store/Pair'
 
 interface IProps {
   pairSelected: IPair

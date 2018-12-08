@@ -19,8 +19,8 @@ export const TokenReceiveAmountDisplay = ({
   receiveExchangeRate=1,
   receiveType,
 }: IProps) => {
-  const tokenData = tokens[type] ? tokens[type] : tokens.BTC
-  const receiveTokenData = tokens[receiveType] ? tokens[receiveType] : tokens.ETH
+  const tokenData = tokens[type]
+  const receiveTokenData = tokens[receiveType]
   const dollars = dollarsExchangeRate ? receiveExchangeRate * dollarsExchangeRate * amount : 0
   const receiveAmount = receiveExchangeRate * amount
 
@@ -33,34 +33,34 @@ export const TokenReceiveAmountDisplay = ({
         />
         <TokenInfo>
           <TokenName>{receiveTokenData.name} ({receiveTokenData.denom})</TokenName>
-          <TokenAmounts>
-            {formatNum(amount, 4)} {tokenData.denom}
-            {' '}={' '}
-            {formatNum(receiveAmount, 4)} {receiveTokenData.denom}
-          </TokenAmounts>
+          {tokenData && receiveTokenData && (
+            <TokenAmounts>
+              {formatNum(amount, 4)} {tokenData.denom}
+              {' '}={' '}
+              {formatNum(receiveAmount, 4)} {receiveTokenData.denom}
+            </TokenAmounts>
+          )}
         </TokenInfo>
       </TokenInfoWrapper>
-      {dollarsExchangeRate && (
-        <CalculatedAmounts>
-          <TokenAmountWrapper>
-            <Amount>
-              {formatNum(receiveAmount, 4)}
-            </Amount>
-            <Denom>
-              {receiveTokenData.denom}
-            </Denom>
-          </TokenAmountWrapper>
-          <Separator/>
-          <USDAmountWrapper>
-            <Amount>
-              ${formatNum(dollars)}
-            </Amount>
-            <Denom>
-              USD
-            </Denom>
-          </USDAmountWrapper>
-        </CalculatedAmounts>
-      )}
+      <CalculatedAmounts>
+        <TokenAmountWrapper>
+          <Amount>
+            {formatNum(receiveAmount, 4)}
+          </Amount>
+          <Denom>
+            {receiveTokenData.denom}
+          </Denom>
+        </TokenAmountWrapper>
+        <Separator/>
+        <USDAmountWrapper>
+          <Amount>
+            {dollarsExchangeRate ? `$${formatNum(dollars)}` : '?'}
+          </Amount>
+          <Denom>
+            USD
+          </Denom>
+        </USDAmountWrapper>
+      </CalculatedAmounts>
     </Wrapper>
   )
 }

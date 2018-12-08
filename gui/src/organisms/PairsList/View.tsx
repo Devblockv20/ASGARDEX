@@ -4,7 +4,8 @@ import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { formatPercent } from 'thorchain-info-common/build/helpers/formatPercent'
 import { ValueColored } from '../../atoms/ValueColored'
-import { IPair, IStore } from '../../store/Store'
+import { IPair } from '../../store/Pair'
+import { IStore } from '../../store/Store'
 
 interface IProps {
   store: IStore

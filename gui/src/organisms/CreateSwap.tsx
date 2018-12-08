@@ -43,6 +43,9 @@ export class CreateSwap extends React.Component<IProps, IState> {
     // Fetch token prices every 5 seconds
     props.store!.fetchPrices()
     setInterval(() => props.store!.fetchPrices(), 5000)
+
+    // Fetch CLPs
+    props.store!.fetchCLPs()
   }
 
   public handleExchangeTokenClick = (selectedExchangeToken:string, selectedExchangeAmount:number) => () => {
@@ -88,38 +91,17 @@ export class CreateSwap extends React.Component<IProps, IState> {
       selectedExchangeAmount,
     } = this.state
 
-    const { getTokenPriceInUsdt } = this.props.store!
+    const { getTokenPriceInUsdt, clps, wallet } = this.props.store!
 
-    // TODO replace with real wallet info
-    const walletTokens = [
-      {
-        amount: '0.1',
-        denom: 'BTC',
-      },
-      {
-        amount: '10',
-        denom: 'ETH',
-      },
-      {
-        amount: '10',
-        denom: 'LTC',
-      },
-      {
-        amount: '100',
-        denom: 'XMR',
-      },
-    ]
+    let exchangeTokensToRender = clps.map(pool => ({ denom: pool.denom }))
+    exchangeTokensToRender.push({ denom: 'RUNE' })
 
-    const exchangeTokensToRender = [
-      { denom: 'BTC' },
-      { denom: 'ETH' },
-      { denom: 'LTC' },
-      { denom: 'XMR' },
-      { denom: 'DASH' },
-      // { denom: 'BCH' }, TODO uncomment when hard fork of BCH has been resolved
-      { denom: 'USDT' },
-      { denom: 'ZIL' },
-    ].filter((token, index) => {
+    exchangeTokensToRender = exchangeTokensToRender.filter((token, index) => {
+      // Exclude these tokens for now - they're not available in Binance's pricing API
+      if (token.denom === 'LOKI' || token.denom === 'CAN') {
+        return false
+      }
+
       if (tokenSearchTerm === '') {
         return true
       }
@@ -145,7 +127,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
             <Header>
               Your Wallet
             </Header>
-            {walletTokens.map((token) => (
+            {wallet && wallet.coins.map((token) => (
               <CoinWrapper key={token.denom}>
                 <Coin
                   type={token.denom}
