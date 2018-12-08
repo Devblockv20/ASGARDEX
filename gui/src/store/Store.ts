@@ -152,6 +152,13 @@ const Wallet = types.model({
     }
   }),
 }))
+.views(self => ({
+  getCoinAmount (denom: string) {
+    const coin = self.coins.find(c => c.denom === denom)
+    if (!coin) { return null }
+    return coin.amount
+  },
+}))
 
 export interface IWallet extends Instance<typeof Wallet> {}
 
