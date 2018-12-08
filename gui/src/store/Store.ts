@@ -118,6 +118,40 @@ export const Store = types.model({
       console.error(`Failed to fetch prices`, error)
     }
   }),
+  getTokenExchangeRate(exchangeDenom: string, receiveDenom: string) {
+    const CLPs = self.clps
+
+    if (!CLPs) {
+      return null
+    }
+
+    let exchangeToRUNE = null
+    let RUNEToReceive = null
+
+    if (exchangeDenom === 'RUNE') {
+      exchangeToRUNE = 1
+    }
+
+    if (receiveDenom === 'RUNE') {
+      RUNEToReceive = 1
+    }
+
+    for (const CLP of CLPs) {
+      if (CLP.denom === exchangeDenom) {
+        exchangeToRUNE = CLP.price
+      }
+
+      if (CLP.denom === receiveDenom) {
+        RUNEToReceive = (1 / CLP.price)
+      }
+    }
+
+    if (exchangeToRUNE === null || RUNEToReceive === null) {
+      return null
+    }
+
+    return exchangeToRUNE * RUNEToReceive
+  },
   getTokenPriceInUsdt(amount: number, denom: string) {
     const pricesData = self.prices
 

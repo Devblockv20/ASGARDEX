@@ -8,7 +8,7 @@ interface IProps {
   type: string,
   amount: number,
   dollarsExchangeRate?: number | null,
-  receiveExchangeRate?: number,
+  receiveExchangeRate?: number | null,
   receiveType: string,
 }
 
@@ -21,8 +21,8 @@ export const TokenReceiveAmountDisplay = ({
 }: IProps) => {
   const tokenData = tokens[type]
   const receiveTokenData = tokens[receiveType]
-  const dollars = dollarsExchangeRate ? receiveExchangeRate * dollarsExchangeRate * amount : 0
-  const receiveAmount = receiveExchangeRate * amount
+  const dollars = dollarsExchangeRate ? (receiveExchangeRate || 1) * dollarsExchangeRate * amount : 0
+  const receiveAmount = (receiveExchangeRate || 0) * amount
 
   return (
     <Wrapper>
@@ -37,7 +37,7 @@ export const TokenReceiveAmountDisplay = ({
             <TokenAmounts>
               {formatNum(amount, 4)} {tokenData.denom}
               {' '}={' '}
-              {formatNum(receiveAmount, 4)} {receiveTokenData.denom}
+              {receiveExchangeRate === null ? '?' : formatNum(receiveAmount, 4)} {receiveTokenData.denom}
             </TokenAmounts>
           )}
         </TokenInfo>

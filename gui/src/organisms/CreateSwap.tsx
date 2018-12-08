@@ -91,7 +91,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
       selectedExchangeAmount,
     } = this.state
 
-    const { getTokenPriceInUsdt, clps, wallet } = this.props.store!
+    const { getTokenPriceInUsdt, getTokenExchangeRate, clps, wallet } = this.props.store!
 
     let exchangeTokensToRender = clps.map(pool => ({ denom: pool.denom }))
     exchangeTokensToRender.push({ denom: 'RUNE' })
@@ -113,8 +113,9 @@ export class CreateSwap extends React.Component<IProps, IState> {
       return token.denom.includes(searchTerm) || tokenName.includes(searchTerm) || Number(searchTerm) === index
     })
 
-    // TODO replace this with real data from CLPs
-    const tokenExchangeRate = 3.2
+    const tokenExchangeRate = selectedExchangeToken === null || selectedReceiveToken === null
+      ? null
+      : getTokenExchangeRate(selectedExchangeToken, selectedReceiveToken)
 
     // Can't exchange more than you have in your wallet
     const maxExchangeAmount = selectedExchangeAmount || 0
@@ -203,10 +204,10 @@ export class CreateSwap extends React.Component<IProps, IState> {
                   exchangeType={selectedExchangeToken}
                   receiveType={selectedReceiveToken}
                   exchangeAmount={totalExchangeAmount}
-                  receiveAmount={totalExchangeAmount * tokenExchangeRate}
+                  receiveAmount={totalExchangeAmount * (tokenExchangeRate || 0)}
                   dollarsExchangeAmount={getTokenPriceInUsdt(totalExchangeAmount, selectedExchangeToken)}
                   dollarsReceiveAmount={
-                    getTokenPriceInUsdt(totalExchangeAmount * tokenExchangeRate, selectedReceiveToken)
+                    getTokenPriceInUsdt(totalExchangeAmount * (tokenExchangeRate || 0), selectedReceiveToken)
                   }
                 />
               )}
