@@ -17,4 +17,7 @@ export const initialState: IStoreIn = {
     { amountDenom: 'LTC', id: 'LTC/RUNE', priceDenom: 'RUNE' },
   ],
   thorchainClientLoaded: false,
+  ui: {
+    tradePageTradeHistoryType: 'market',
+  },
 }

@@ -79,6 +79,7 @@ const Pair = types.model({
   priceDenom: types.string,
   sellOrderbook: types.maybeNull(Orderbook),
   trades: types.maybeNull(types.array(Trade)),
+  tradesOwn: types.maybeNull(types.array(Trade)),
 })
 .actions(self => ({
   fetchOhlcv: flow(function* fetchOhlcv() {
@@ -115,6 +116,16 @@ const Pair = types.model({
     } catch (error) {
       // tslint:disable-next-line:no-console
       console.error(`Failed to fetch trades ${self.amountDenom}/${self.priceDenom}`, error)
+    }
+  }),
+  fetchTradesOwn: flow(function* fetchTradesOwn(account: string) {
+    try {
+      const result: IExchangePair = yield http.get(
+        env.REACT_APP_API_HOST + `/exchange/trades/${self.priceDenom}/${self.amountDenom}?account=${account}`)
+      self.tradesOwn = cast(result)
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to fetch own trades ${self.amountDenom}/${self.priceDenom}?account=${account}`, error)
     }
   }),
 }))
@@ -173,11 +184,23 @@ const Wallet = types.model({
 
 export interface IWallet extends Instance<typeof Wallet> {}
 
+const UI = types.model({
+  tradePageTradeHistoryType: types.enumeration(['market', 'own']),
+})
+.actions(self => ({
+  setTradePageTradeHistoryType (type: 'market' | 'own') {
+    self.tradePageTradeHistoryType = type
+  },
+}))
+
+export interface IUI extends Instance<typeof UI> {}
+
 export const Store = types.model({
   pairSelected: types.reference(Pair),
   pairs: types.array(Pair),
   prices: types.array(Price),
   thorchainClientLoaded: types.boolean,
+  ui: UI,
   wallet: types.maybeNull(Wallet),
 })
 .actions(self => ({
@@ -339,6 +362,7 @@ export const Store = types.model({
       self.pairSelected.fetchOhlcv(),
       self.pairSelected.fetchOrderboks(),
       self.pairSelected.fetchTrades(),
+      self.pairSelected.fetchTradesOwn(wallet.address),
     ])
 
     return {
@@ -351,6 +375,9 @@ export const Store = types.model({
       self.pairs.map(pair => pair.fetchOhlcv())
       self.pairSelected.fetchOrderboks()
       self.pairSelected.fetchTrades()
+      if (self.wallet) {
+        self.pairSelected.fetchTradesOwn(self.wallet.address)
+      }
     }
 
     setInterval(fetch, 1000)

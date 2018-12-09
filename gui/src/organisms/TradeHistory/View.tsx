@@ -5,17 +5,51 @@ import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { ITrade } from '../../store/Store'
 
 interface IProps {
+  setTradePageTradeHistoryType: (type: 'market' | 'own') => void
+  tradePageTradeHistoryType: 'market' | 'own'
   trades: ITrade[]
+  tradesOwn: ITrade[]
 }
 
-export const TradeHistoryView = observer(({ trades }: IProps) => <Container>
-  <Header>
-    Trade History
-  </Header>
-  {trades.map(trade => (
-    <TradeLine key={trade.key} trade={trade} />
-  ))}
-</Container>)
+@observer
+export class TradeHistoryView extends React.Component<IProps> {
+
+  public render() {
+    const { tradePageTradeHistoryType, trades, tradesOwn } = this.props
+
+    return (
+      <Container>
+        <Header>
+          Trade History
+          <Button active={tradePageTradeHistoryType === 'market'} onClick={this.setMarket}>Market</Button>
+          <Button active={tradePageTradeHistoryType === 'own'} onClick={this.setOwn}>Yours</Button>
+        </Header>
+        {(tradePageTradeHistoryType === 'market' ? trades : tradesOwn).map(trade => (
+          <TradeLine key={trade.key} trade={trade} />
+        ))}
+      </Container>
+    )
+  }
+  private setMarket = () => this.props.setTradePageTradeHistoryType('market')
+  private setOwn = () => this.props.setTradePageTradeHistoryType('own')
+}
+
+const Button = styled.button<{ active: boolean }>`
+  margin-left: 14px;
+  background: transparent;
+  border-radius: 5px;
+  font-family: 'Open Sans';
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.63px;
+  text-align: center;
+  color: #ffffff;
+  width: 88px;
+  height: 25px;
+  border: 1px solid white;
+  opacity: ${({ active }) => active ? '1' : '0.5'};
+  outline: none;
+`
 
 const TradeLine = observer(({ trade }: { trade: ITrade }) => <TradeLineRow>
   <Col>{formatNum(trade.price, 2)}</Col>

@@ -11,10 +11,13 @@ interface IProps {
 @observer
 export class TradeHistoryContainer extends React.Component<IProps, object> {
   public render() {
-    const { trades } = this.props.store!.pairSelected
+    const { pairSelected, ui: { setTradePageTradeHistoryType, tradePageTradeHistoryType } } = this.props.store!
+    const { trades, tradesOwn } = pairSelected
 
-    if (!trades) { return null }
+    if (!trades || !tradesOwn) { return null }
 
-    return <TradeHistoryView trades={trades} />
+    return <TradeHistoryView
+      setTradePageTradeHistoryType={setTradePageTradeHistoryType} tradePageTradeHistoryType={tradePageTradeHistoryType}
+      trades={trades} tradesOwn={tradesOwn} />
   }
 }
