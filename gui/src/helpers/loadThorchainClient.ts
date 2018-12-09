@@ -4,14 +4,14 @@ import { Runner } from 'thorchain-wasm-client/dist/runner/Runner'
 
 declare var Go: any
 
-interface IClient {
+export interface IClient {
   client: Client,
   runner: Runner
 }
 
 // Cache
 let client: IClient | null = null
-let clientPromise: any
+let clientPromise: Promise<IClient>
 
 /**
  * This setup is so that we don't load the client more than once
@@ -19,7 +19,7 @@ let clientPromise: any
  */
 export const loadThorchainClient = () => {
   if (client) {
-    clientPromise = null
+    clientPromise = Promise.resolve(client)
     return Promise.resolve(client)
   }
 

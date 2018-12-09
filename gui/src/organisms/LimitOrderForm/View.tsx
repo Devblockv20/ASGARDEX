@@ -1,6 +1,8 @@
 import { ErrorMessage, Field, Form, FormikProps } from 'formik'
+import { observer } from 'mobx-react'
 import * as React from 'react'
 import styled from 'styled-components'
+import { Alert } from '../../atoms/Alert'
 import { BodyText } from '../../atoms/BodyText'
 import { FieldError } from '../../atoms/FieldError'
 import { Input } from '../../atoms/Input'
@@ -9,32 +11,31 @@ import {
   InputTickerAddition, inputTickerAdditionPadding, inputTickerAdditionPaddingWide,
 } from '../../atoms/InputTickerAddition'
 import { FieldInput } from '../../molecules/FieldInput'
-
-export interface IFormValues {
-  amount: string
-  price: string
-}
+import { IFormValues, IStatus } from './Container'
 
 interface IViewProps {
-  availableAmountDenom: string | null,
-  availablePriceDenom: string | null,
+  availableTokensAmountDenom: string | null,
+  availableTokensPriceDenom: string | null,
   amountDenom: string,
   priceDenom: string,
   buy: boolean,
   total: number | null
   setPercentage: (percentage: number) => () => void
   isPercentage: (percentage: number) => boolean
+  status: IStatus
 }
 
-export const LimitOrderFormView = ({
-  availableAmountDenom, availablePriceDenom, amountDenom, priceDenom, buy, total, setPercentage, isPercentage,
+export const LimitOrderFormView = observer(({
+  availableTokensAmountDenom, availableTokensPriceDenom, amountDenom, priceDenom,
+  buy, total, setPercentage, isPercentage, status,
 }: FormikProps<IFormValues> & IViewProps) => (
   <Form>
     <H2>{buy ? 'Buy' : 'Sell'}</H2>
     <FormRow style={{ marginTop: 41 }}>
       <ColLabel><BodyText>Price:</BodyText></ColLabel>
       <ColInput>
-        <Field name="price" component={FieldInput} style={inputTickerAdditionPaddingWide} />
+        <Field name="price" component={FieldInput} style={inputTickerAdditionPaddingWide}
+          disabled={status.is === 'loading'} />
         <InputTickerAddition>{priceDenom}/{amountDenom}</InputTickerAddition>
         <ErrorMessage name="price" component={FieldError} />
       </ColInput>
@@ -42,7 +43,8 @@ export const LimitOrderFormView = ({
     <FormRow style={{ marginTop: 12 }}>
       <ColLabel><BodyText>Amount:</BodyText></ColLabel>
       <ColInput>
-        <Field name="amount" component={FieldInput} style={inputTickerAdditionPadding} />
+        <Field name="amount" component={FieldInput} style={inputTickerAdditionPadding}
+          disabled={status.is === 'loading'} />
         <InputTickerAddition>{amountDenom}</InputTickerAddition>
         <ErrorMessage name="amount" component={FieldError} />
       </ColInput>
@@ -53,10 +55,14 @@ export const LimitOrderFormView = ({
         <Input style={inputTickerAdditionPadding} disabled={true} value={total || ''} />
         <InputTickerAddition>{priceDenom}</InputTickerAddition>
         <InputRadioButtonGroup>
-          <BtnPercentage type="button" onClick={setPercentage(0.25)} active={isPercentage(0.25)}>25%</BtnPercentage>
-          <BtnPercentage type="button" onClick={setPercentage(0.5)} active={isPercentage(0.5)}>50%</BtnPercentage>
-          <BtnPercentage type="button" onClick={setPercentage(0.75)} active={isPercentage(0.75)}>75%</BtnPercentage>
-          <BtnPercentage type="button" onClick={setPercentage(1)} active={isPercentage(1)}>100%</BtnPercentage>
+          <BtnPercentage type="button" disabled={status.is === 'loading'}
+            onClick={setPercentage(0.25)} active={isPercentage(0.25)}>25%</BtnPercentage>
+          <BtnPercentage type="button" disabled={status.is === 'loading'}
+            onClick={setPercentage(0.5)} active={isPercentage(0.5)}>50%</BtnPercentage>
+          <BtnPercentage type="button" disabled={status.is === 'loading'}
+            onClick={setPercentage(0.75)} active={isPercentage(0.75)}>75%</BtnPercentage>
+          <BtnPercentage type="button" disabled={status.is === 'loading'}
+            onClick={setPercentage(1)} active={isPercentage(1)}>100%</BtnPercentage>
         </InputRadioButtonGroup>
       </ColInput>
     </FormRow>
@@ -64,13 +70,19 @@ export const LimitOrderFormView = ({
       <ColLabel />
       <ColInput style={{ textAlign: 'right' }}><BodyText style={{ opacity: 0.56 }}>
         Of available:{' '}
-        {buy ? `${availablePriceDenom || 0} ${priceDenom}` : `${availableAmountDenom || 0} ${amountDenom}`}
+        {buy ? `${availableTokensPriceDenom || 0} ${priceDenom}` : `${availableTokensAmountDenom || 0} ${amountDenom}`}
       </BodyText></ColInput>
     </FormRow>
-    {buy ? <ButtonBuy type="submit">BUY {amountDenom}</ButtonBuy> :
-      <ButtonSell type="submit">SELL {amountDenom}</ButtonSell>}
+    {status.is === 'error' && (
+      <Alert>Your order could not be placed:<br /><br />{status.msg}</Alert>
+    )}
+    {status.is === 'success' && (
+      <Alert color="success">Your order has been committed at block height {status.height}</Alert>
+    )}
+    {buy ? <ButtonBuy type="submit" disabled={status.is === 'loading'}>BUY {amountDenom}</ButtonBuy> :
+      <ButtonSell type="submit" disabled={status.is === 'loading'}>SELL {amountDenom}</ButtonSell>}
   </Form>
-)
+))
 
 const BtnPercentage = styled(InputRadioButton)`
   flex: 1 0 60px;

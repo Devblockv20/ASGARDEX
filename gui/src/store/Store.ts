@@ -1,9 +1,10 @@
 import { cast, flow, Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree'
+import * as moment from 'moment'
 import { IExchangePair } from 'thorchain-info-common/src/interfaces/metrics'
 import { downloadFile } from '../helpers/downloadFile'
 import { env } from '../helpers/env'
 import { http } from '../helpers/http'
-import { loadThorchainClient } from '../helpers/loadThorchainClient'
+import { IClient, loadThorchainClient } from '../helpers/loadThorchainClient'
 
 const Coin = types.model({
   amount: types.string,
@@ -151,6 +152,16 @@ const Wallet = types.model({
       console.error(`Failed to fetch wallet coins`, error)
     }
   }),
+  fetchLatestAccountNumberAndSequence: flow(function* fetchLatestAccountNumberAndSequence() {
+    const account = yield http.get(`${env.REACT_APP_LCD_API_HOST}/accounts/${self.address}`)
+    const accountNumber = parseInt(account.value.account_number, 10)
+    const sequence = parseInt(account.value.sequence, 10)
+    if (isNaN(accountNumber)) { throw new Error(
+      `Could not get valid account number for address "${self.address}", got ${account.value.account_number}`) }
+    if (isNaN(sequence)) { throw new Error(
+      `Could not get valid sequence for address "${self.address}", got ${account.value.sequence}`) }
+    return { accountNumber, sequence }
+  }),
 }))
 .views(self => ({
   getCoinAmount (denom: string) {
@@ -173,7 +184,7 @@ export const Store = types.model({
   selectPair(pair: IPair) {
     self.pairSelected = cast(pair.id)
   },
-  createWallet: flow(function* fetchPrices() {
+  createWallet: flow(function* createWallet() {
     try {
       const { client } = yield loadThorchainClient()
       const walletString = yield client.createKey()
@@ -291,6 +302,45 @@ export const Store = types.model({
       console.error(`Failed to load up thorchain client`, error)
     }
   }),
+  signAndBroadcastExchangeCreateLimitOrderTx: flow(function* signAndBroadcastExchangeCreateLimitOrderTx(
+    kind: 'buy' | 'sell', amount: string, price: string,
+  ) {
+    const { wallet } = self
+    if (!wallet) {
+      throw new Error('Wallet not loaded')
+    }
+
+    const sender = wallet.address
+    const { accountNumber, sequence } = yield wallet.fetchLatestAccountNumberAndSequence()
+    const txContext = {
+      account_number: accountNumber,
+      chain_id: env.REACT_APP_CHAIN_ID,
+      fee: '',
+      gas: 20000,
+      memo: '',
+      priv_key: wallet.privateKey,
+      sequence,
+    }
+
+    const expiresAt = moment().add(1, 'day').toISOString()
+
+    const { client }: IClient = yield loadThorchainClient()
+
+    const res =
+      yield client.signAndBroadcastExchangeCreateLimitOrderTx(txContext, sender, kind, amount, price, expiresAt)
+
+    if (res.result.check_tx.code || res.result.deliver_tx.code) {
+      throw new Error(`Unknown error committing tx, result: ${JSON.stringify(res.result)}`)
+    }
+
+    // update coins
+    yield wallet.fetchCoins()
+
+    return {
+      height: res.result.height,
+      isOk: true,
+    }
+  }),
   sub() {
     const fetch = () => {
       self.pairs.map(pair => pair.fetchOhlcv())
@@ -298,7 +348,7 @@ export const Store = types.model({
       self.pairSelected.fetchTrades()
     }
 
-    setInterval(fetch, 1000)
+    // setInterval(fetch, 1000)
 
     fetch()
   },

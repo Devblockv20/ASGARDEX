@@ -1,9 +1,10 @@
-import { FormikProps, withFormik } from 'formik'
+import { Formik, FormikActions } from 'formik'
+import { observable, runInAction } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import * as React from 'react'
 import * as Yup from 'yup'
 import { IStore } from '../../store/Store'
-import { LimitOrderFormView } from './View'
+import { LimitOrderFormControls } from './Controls'
 
 export interface IFormValues {
   amount: string
@@ -15,81 +16,55 @@ interface IContainerProps {
   amountDenom: string,
   priceDenom: string,
   buy: boolean,
-  // createLimitOrder: (values: IFormValues) => void
 }
+
+export type IStatus =  { is: null } | { is: 'loading' } | { is: 'error', msg: string } |
+  { is: 'success', height: number }
 
 @inject('store')
 @observer
-class LimitOrderFormContainerInner extends React.Component<FormikProps<IFormValues> & IContainerProps> {
-  public setPercentage = (percentage: number) => () => {
-    const { wallet } = this.props.store!
-    if (!wallet) { return }
+export class LimitOrderFormContainer extends React.Component<IContainerProps> {
+  @observable private status: IStatus = { is: null }
 
-    if (this.props.buy) {
-      const availableTotal = wallet.getCoinAmount(this.props.priceDenom)
-      if (availableTotal === null) { return }
+  public handleSubmit: (values: IFormValues, formikActions: FormikActions<IFormValues>) => void =
+    async (values, formikActions) => {
+      runInAction(() => { this.status = { is: 'loading' } })
 
-      let priceFloat = parseFloat(this.props.values.price)
+      const { store, buy, amountDenom, priceDenom } = this.props
 
-      if (isNaN(priceFloat)) {
-        this.props.setFieldValue('price', '1')
-        priceFloat = 1
+      try {
+        const res = await store!.signAndBroadcastExchangeCreateLimitOrderTx(
+          buy ? 'buy' : 'sell', `${values.amount}${amountDenom}`, `${values.price}${priceDenom}`)
+        formikActions.resetForm()
+        runInAction(() => { this.status = { is: 'success', height: res.height } })
+      } catch (e) {
+        runInAction(() => { this.status = { is: 'error', msg: e.message } })
       }
-
-      this.props.setFieldValue('amount', parseFloat(availableTotal) / priceFloat * percentage)
-    } else {
-      const availableAmount = wallet.getCoinAmount(this.props.amountDenom)
-      if (availableAmount === null) { return }
-
-      this.props.setFieldValue('amount', parseFloat(availableAmount) * percentage)
     }
-  }
-
-  public isPercentage = (percentage: number): boolean => {
-    const { wallet } = this.props.store!
-    if (!wallet) { return false }
-
-    if (this.props.buy) {
-      const availableTotal = wallet.getCoinAmount(this.props.priceDenom)
-      if (availableTotal === null) { return false }
-      const priceFloat = parseFloat(this.props.values.price)
-      if (isNaN(priceFloat)) { return false }
-       return parseFloat(availableTotal) / priceFloat * percentage === this.getTotal()
-    } else {
-      const availableAmount = wallet.getCoinAmount(this.props.amountDenom)
-      if (availableAmount === null) { return false }
-      const amountFloat = parseFloat(this.props.values.amount)
-      if (isNaN(amountFloat)) { return false }
-      return parseFloat(availableAmount) * percentage === amountFloat
-    }
-  }
-
-  public getTotal = () => {
-    const amountFloat = parseFloat(this.props.values.amount)
-    const priceFloat = parseFloat(this.props.values.price)
-
-    if (isNaN(amountFloat) || isNaN(priceFloat)) { return null }
-
-    return amountFloat * priceFloat
-  }
 
   public render() {
-    const { buy, ...rest } = this.props
+    const { store, ...rest } = this.props
+    const { wallet } = store!
+    const availableTokensAmountDenom = wallet ? wallet.getCoinAmount(this.props.amountDenom) : null
+    const availableTokensPriceDenom = wallet ? wallet.getCoinAmount(this.props.priceDenom) : null
 
-    const { wallet } = this.props.store!
-    const availablePriceDenom = wallet ? wallet.getCoinAmount(this.props.priceDenom) : null
-    const availableAmountDenom = wallet ? wallet.getCoinAmount(this.props.amountDenom) : null
+    if (this.status.is) { /* TODO */ }
 
     return (
-      <LimitOrderFormView
-        availableAmountDenom={availableAmountDenom}
-        availablePriceDenom={availablePriceDenom}
-        buy={buy}
-        {...rest}
-        total={this.getTotal()}
-        setPercentage={this.setPercentage}
-        isPercentage={this.isPercentage}
-      />
+      <Formik
+        initialValues={{ amount: '', price: '' }}
+        onSubmit={this.handleSubmit}
+        validateOnBlur={true}
+        validationSchema={validLimitOrderSchema}
+      >{formikProps => (
+        <LimitOrderFormControls
+          {...formikProps}
+          {...rest}
+          availableTokensAmountDenom={availableTokensAmountDenom}
+          availableTokensPriceDenom={availableTokensPriceDenom}
+          status={this.status}
+        />
+      )}</Formik>
     )
   }
 }
@@ -103,14 +78,3 @@ const validLimitOrderSchema = Yup.object().shape({
   price: Yup.string().required('Please enter a price')
     .matches(fractionalPositiveNumRegExp, 'Please enter a valid number'), // TODO add max
 })
-
-export const LimitOrderFormContainer = withFormik<IContainerProps, IFormValues>({
-  handleSubmit: async (values, { props }) => {
-    // tslint:disable-next-line:no-console
-    console.log('submitting with values:', values, 'buy?', props.buy)
-    // await props.createLimitOrder(values)
-  },
-  mapPropsToValues: () => ({ amount: '', price: '' }),
-  validateOnBlur: true,
-  validationSchema: validLimitOrderSchema,
-})(LimitOrderFormContainerInner)
