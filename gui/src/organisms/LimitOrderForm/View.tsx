@@ -27,7 +27,7 @@ interface IViewProps {
 
 export const LimitOrderFormView = observer(({
   availableTokensAmountDenom, availableTokensPriceDenom, amountDenom, priceDenom,
-  buy, total, setPercentage, isPercentage, status,
+  buy, total, setPercentage, isPercentage, status, errors,
 }: FormikProps<IFormValues> & IViewProps) => (
   <Form>
     <H2>{buy ? 'Buy' : 'Sell'}</H2>
@@ -54,6 +54,7 @@ export const LimitOrderFormView = observer(({
       <ColInput>
         <Input style={inputTickerAdditionPadding} disabled={true} value={total || ''} />
         <InputTickerAddition>{priceDenom}</InputTickerAddition>
+        {errors.total && <FieldError>{errors.total}</FieldError>}
         <InputRadioButtonGroup>
           <BtnPercentage type="button" disabled={status.is === 'loading'}
             onClick={setPercentage(0.25)} active={isPercentage(0.25)}>25%</BtnPercentage>

@@ -348,7 +348,7 @@ export const Store = types.model({
       self.pairSelected.fetchTrades()
     }
 
-    // setInterval(fetch, 1000)
+    setInterval(fetch, 1000)
 
     fetch()
   },

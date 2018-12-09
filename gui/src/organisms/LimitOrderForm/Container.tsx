@@ -9,6 +9,7 @@ import { LimitOrderFormControls } from './Controls'
 export interface IFormValues {
   amount: string
   price: string
+  total: string
 }
 
 interface IContainerProps {
@@ -42,24 +43,51 @@ export class LimitOrderFormContainer extends React.Component<IContainerProps> {
       }
     }
 
-  public render() {
-    const { store, ...rest } = this.props
+  public validate = (values: IFormValues) => {
+    const { amountDenom, priceDenom, store, buy } = this.props
     const { wallet } = store!
-    const availableTokensAmountDenom = wallet ? wallet.getCoinAmount(this.props.amountDenom) : null
-    const availableTokensPriceDenom = wallet ? wallet.getCoinAmount(this.props.priceDenom) : null
 
-    if (this.status.is) { /* TODO */ }
+    if (buy) {
+      const availableTokensPriceDenom = wallet ? wallet.getCoinAmount(priceDenom) : null
+      const total = parseFloat(values.amount) * parseFloat(values.price)
+
+      if (isNaN(total) || availableTokensPriceDenom === null) { return }
+      if (total > parseFloat(availableTokensPriceDenom)) {
+        return { total: `Cannot buy for more than the available ${availableTokensPriceDenom}${priceDenom}` }
+      }
+    } else {
+      const availableTokensAmountDenom = wallet ? wallet.getCoinAmount(amountDenom) : null
+      const amountFloat = parseFloat(values.amount)
+
+      if (isNaN(amountFloat) || availableTokensAmountDenom === null) { return }
+      if (amountFloat > parseFloat(availableTokensAmountDenom)) {
+        return { amount: `Cannot sell more than the available ${availableTokensAmountDenom}${amountDenom}` }
+      }
+    }
+    return {}
+  }
+
+  public render() {
+    const { amountDenom, priceDenom, store, ...rest } = this.props
+    const { wallet } = store!
+    const availableTokensAmountDenom = wallet ? wallet.getCoinAmount(amountDenom) : null
+    const availableTokensPriceDenom = wallet ? wallet.getCoinAmount(priceDenom) : null
+
+    if (this.status.is) { /* To make MobX react */ }
 
     return (
       <Formik
-        initialValues={{ amount: '', price: '' }}
+        initialValues={{ amount: '', price: '', total: '' }}
         onSubmit={this.handleSubmit}
         validateOnBlur={true}
         validationSchema={validLimitOrderSchema}
+        validate={this.validate}
       >{formikProps => (
         <LimitOrderFormControls
           {...formikProps}
           {...rest}
+          amountDenom={amountDenom}
+          priceDenom={priceDenom}
           availableTokensAmountDenom={availableTokensAmountDenom}
           availableTokensPriceDenom={availableTokensPriceDenom}
           status={this.status}
@@ -74,7 +102,7 @@ const fractionalPositiveNumRegExp = /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/
 
 const validLimitOrderSchema = Yup.object().shape({
   amount: Yup.string().required('Please enter an amount')
-    .matches(fractionalPositiveNumRegExp, 'Please enter a valid number'), // TODO add max
+    .matches(fractionalPositiveNumRegExp, 'Please enter a valid number'),
   price: Yup.string().required('Please enter a price')
-    .matches(fractionalPositiveNumRegExp, 'Please enter a valid number'), // TODO add max
+    .matches(fractionalPositiveNumRegExp, 'Please enter a valid number'),
 })
