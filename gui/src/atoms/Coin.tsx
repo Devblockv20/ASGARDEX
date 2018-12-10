@@ -70,6 +70,7 @@ export const Coin = ({ selected, type, big, style, onClick }: IProps) => {
         selected={selected}
         onClick={onClick}
         style={style}
+        tabIndex={onClick ? 0 : undefined}
       >
         {coinData.denom}
       </Placeholder>
