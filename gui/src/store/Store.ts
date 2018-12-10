@@ -1,161 +1,15 @@
 import { cast, flow, Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree'
-import { IExchangePair } from 'thorchain-info-common/src/interfaces/metrics'
 import { downloadFile } from '../helpers/downloadFile'
 import { env } from '../helpers/env'
 import { http } from '../helpers/http'
 import { loadThorchainClient } from '../helpers/loadThorchainClient'
-
-const Coin = types.model({
-  amount: types.string,
-  denom: types.string,
-})
-
-export interface ICoin extends Instance<typeof Coin> {}
-
-const Order = types.model({
-  amount: Coin,
-  kind: types.number,
-  order_id: types.identifier,
-  price: Coin,
-})
-
-export interface IOrder extends Instance<typeof Order> {}
-
-const Orderbook = types.model({
-  amountDenom: types.string,
-  kind: types.number,
-  orders: types.maybeNull(types.array(Order)),
-  priceDenom: types.string,
-})
-
-export interface IOrderbook extends Instance<typeof Orderbook> {}
-
-const Trade = types.model({
-  amount: types.number,
-  price: types.number,
-})
-.views(self => ({
-  get key () {
-    return self.amount + '/' + self.price
-  },
-  get volume () {
-    return self.amount * self.price
-  },
-}))
-
-export interface ITrade extends Instance<typeof Trade> {}
-
-// variable names in this model are in line with TradingView:
-// c: closing price
-// h: highest price
-// l: lowest price
-// o: opening price
-// v: volume
-const PairOHLCV = types.model({
-  c: types.number,
-  h: types.number,
-  l: types.number,
-  o: types.number,
-  v: types.number,
-})
-.views(self => ({
-  get change () {
-    return self.c - self.o
-  },
-  get changePercent () {
-    if (self.o === 0) { return 0 }
-    return (self.c - self.o) / self.o
-  },
-}))
-
-export interface IPairOHLCV extends Instance<typeof PairOHLCV> {}
-
-const Pair = types.model({
-  amountDenom: types.string,
-  buyOrderbook: types.maybeNull(Orderbook),
-  id: types.identifier,
-  ohlcv: types.maybeNull(PairOHLCV),
-  priceDenom: types.string,
-  sellOrderbook: types.maybeNull(Orderbook),
-  trades: types.maybeNull(types.array(Trade)),
-})
-.actions(self => ({
-  fetchOhlcv: flow(function* fetchOhlcv() {
-    try {
-      const result: IExchangePair = yield http.get(
-        env.REACT_APP_API_HOST + `/exchange/pair/${self.priceDenom}/${self.amountDenom}`)
-      self.ohlcv = cast(result)
-    } catch (error) {
-      // tslint:disable-next-line:no-console
-      console.error(`Failed to fetch pair ${self.amountDenom}/${self.priceDenom}`, error)
-    }
-  }),
-  fetchOrderboks: flow(function* fetchOrderboks() {
-    try {
-      const [buyOrderbook, sellOrderbook] = yield Promise.all([
-        http.post(env.REACT_APP_LCD_API_HOST + '/exchange/query-order-book',
-          { kind: 'buy', amount_denom: self.amountDenom, price_denom: self.priceDenom }),
-        http.post(env.REACT_APP_LCD_API_HOST + '/exchange/query-order-book',
-          { kind: 'sell', amount_denom: self.amountDenom, price_denom: self.priceDenom }),
-      ])
-
-      self.buyOrderbook = cast(buyOrderbook)
-      self.sellOrderbook = cast(sellOrderbook)
-    } catch (error) {
-      // tslint:disable-next-line:no-console
-      console.error(`Failed to fetch orderbooks for ${self.amountDenom}/${self.priceDenom}`, error)
-    }
-  }),
-  fetchTrades: flow(function* fetchTrades() {
-    try {
-      const result: IExchangePair = yield http.get(
-        env.REACT_APP_API_HOST + `/exchange/trades/${self.priceDenom}/${self.amountDenom}`)
-      self.trades = cast(result)
-    } catch (error) {
-      // tslint:disable-next-line:no-console
-      console.error(`Failed to fetch trades ${self.amountDenom}/${self.priceDenom}`, error)
-    }
-  }),
-}))
-
-export interface IPair extends Instance<typeof Pair> {}
-
-
-const Price = types.model({
-  price: types.number,
-  symbol: types.string,
-})
-
-export interface IPrice extends Instance<typeof Price> {}
-
-const Wallet = types.model({
-  address: types.string,
-  coins: types.array(Coin),
-  privateKey: types.string,
-  publicKey: types.string,
-})
-.actions(self => ({
-  fetchCoins: flow(function* fetchCoins() {
-    try {
-      const account: any = yield http.get(
-        `${env.REACT_APP_LCD_API_HOST}/accounts/${self.address}`,
-      )
-
-      if (!account) {
-        return
-      }
-
-      self.coins = cast(account.value.coins)
-    } catch (error) {
-      // tslint:disable-next-line:no-console
-      console.error(`Failed to fetch wallet coins`, error)
-    }
-  }),
-}))
-
-export interface IWallet extends Instance<typeof Wallet> {}
+import { IPair, Pair } from './Pair'
+import { IPrice, Price } from './Price'
+import { TradingPool } from './TradingPool'
+import { Wallet } from './Wallet'
 
 export const Store = types.model({
+  clps: types.array(TradingPool),
   pairSelected: types.reference(Pair),
   pairs: types.array(Pair),
   prices: types.array(Price),
@@ -230,6 +84,29 @@ export const Store = types.model({
       console.error(`Failed to load wallet from localstorage`, error)
     }
   },
+  fetchCLPs: flow(function* fetchCLPs() {
+    try {
+      const clps: [any] = yield http.get(
+        `${env.REACT_APP_LCD_API_HOST}/clps`,
+      )
+      self.clps = cast(clps.map(pool => ({
+        accountAddress: pool.clp.account_address,
+        creator: pool.clp.creator,
+        currentSupply: Number(pool.clp.currentSupply),
+        decimals: pool.clp.decimals,
+        denom: pool.clp.ticker,
+        denomAmount: pool.account[pool.clp.ticker],
+        initialSupply: Number(pool.clp.initialSupply),
+        name: pool.clp.name,
+        price: pool.account.price,
+        reserveRatio: Number(pool.clp.reserveRatio),
+        runeAmount: pool.account.RUNE,
+      })))
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to fetch CLPs`, error)
+    }
+  }),
   fetchPrices: flow(function* fetchPrices() {
     try {
       const prices: [IPrice] = yield http.get(
@@ -241,6 +118,40 @@ export const Store = types.model({
       console.error(`Failed to fetch prices`, error)
     }
   }),
+  getTokenExchangeRate(exchangeDenom: string, receiveDenom: string) {
+    const CLPs = self.clps
+
+    if (!CLPs) {
+      return null
+    }
+
+    let exchangeToRUNE = null
+    let RUNEToReceive = null
+
+    if (exchangeDenom === 'RUNE') {
+      exchangeToRUNE = 1
+    }
+
+    if (receiveDenom === 'RUNE') {
+      RUNEToReceive = 1
+    }
+
+    for (const CLP of CLPs) {
+      if (CLP.denom === exchangeDenom) {
+        exchangeToRUNE = CLP.price
+      }
+
+      if (CLP.denom === receiveDenom) {
+        RUNEToReceive = (1 / CLP.price)
+      }
+    }
+
+    if (exchangeToRUNE === null || RUNEToReceive === null) {
+      return null
+    }
+
+    return exchangeToRUNE * RUNEToReceive
+  },
   getTokenPriceInUsdt(amount: number, denom: string) {
     const pricesData = self.prices
 

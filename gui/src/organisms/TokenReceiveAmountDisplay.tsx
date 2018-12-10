@@ -8,7 +8,7 @@ interface IProps {
   type: string,
   amount: number,
   dollarsExchangeRate?: number | null,
-  receiveExchangeRate?: number,
+  receiveExchangeRate?: number | null,
   receiveType: string,
 }
 
@@ -19,10 +19,10 @@ export const TokenReceiveAmountDisplay = ({
   receiveExchangeRate=1,
   receiveType,
 }: IProps) => {
-  const tokenData = tokens[type] ? tokens[type] : tokens.BTC
-  const receiveTokenData = tokens[receiveType] ? tokens[receiveType] : tokens.ETH
-  const dollars = dollarsExchangeRate ? receiveExchangeRate * dollarsExchangeRate * amount : 0
-  const receiveAmount = receiveExchangeRate * amount
+  const tokenData = tokens[type]
+  const receiveTokenData = tokens[receiveType]
+  const dollars = dollarsExchangeRate ? (receiveExchangeRate || 1) * dollarsExchangeRate * amount : 0
+  const receiveAmount = (receiveExchangeRate || 0) * amount
 
   return (
     <Wrapper>
@@ -33,34 +33,34 @@ export const TokenReceiveAmountDisplay = ({
         />
         <TokenInfo>
           <TokenName>{receiveTokenData.name} ({receiveTokenData.denom})</TokenName>
-          <TokenAmounts>
-            {formatNum(amount, 4)} {tokenData.denom}
-            {' '}={' '}
-            {formatNum(receiveAmount, 4)} {receiveTokenData.denom}
-          </TokenAmounts>
+          {tokenData && receiveTokenData && (
+            <TokenAmounts>
+              {formatNum(amount, 4)} {tokenData.denom}
+              {' '}={' '}
+              {receiveExchangeRate === null ? '?' : formatNum(receiveAmount, 4)} {receiveTokenData.denom}
+            </TokenAmounts>
+          )}
         </TokenInfo>
       </TokenInfoWrapper>
-      {dollarsExchangeRate && (
-        <CalculatedAmounts>
-          <TokenAmountWrapper>
-            <Amount>
-              {formatNum(receiveAmount, 4)}
-            </Amount>
-            <Denom>
-              {receiveTokenData.denom}
-            </Denom>
-          </TokenAmountWrapper>
-          <Separator/>
-          <USDAmountWrapper>
-            <Amount>
-              ${formatNum(dollars)}
-            </Amount>
-            <Denom>
-              USD
-            </Denom>
-          </USDAmountWrapper>
-        </CalculatedAmounts>
-      )}
+      <CalculatedAmounts>
+        <TokenAmountWrapper>
+          <Amount>
+            {formatNum(receiveAmount, 4)}
+          </Amount>
+          <Denom>
+            {receiveTokenData.denom}
+          </Denom>
+        </TokenAmountWrapper>
+        <Separator/>
+        <USDAmountWrapper>
+          <Amount>
+            {dollarsExchangeRate ? `$${formatNum(dollars)}` : '?'}
+          </Amount>
+          <Denom>
+            USD
+          </Denom>
+        </USDAmountWrapper>
+      </CalculatedAmounts>
     </Wrapper>
   )
 }
