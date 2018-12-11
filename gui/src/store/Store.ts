@@ -5,6 +5,7 @@ import { downloadFile } from '../helpers/downloadFile'
 import { env } from '../helpers/env'
 import { http } from '../helpers/http'
 import { IClient, loadThorchainClient } from '../helpers/loadThorchainClient'
+import { uniqueId } from '../helpers/uniqueId'
 
 const Coin = types.model({
   amount: types.string,
@@ -37,7 +38,7 @@ const Trade = types.model({
 })
 .views(self => ({
   get key () {
-    return self.amount + '/' + self.price
+    return uniqueId('trade')
   },
   get volume () {
     return self.amount * self.price
