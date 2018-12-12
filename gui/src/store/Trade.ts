@@ -1,4 +1,5 @@
 import { Instance, types } from 'mobx-state-tree'
+import { uniqueId } from '../helpers/uniqueId'
 
 export const Trade = types.model({
   amount: types.number,
@@ -6,7 +7,7 @@ export const Trade = types.model({
 })
 .views(self => ({
   get key () {
-    return self.amount + '/' + self.price
+    return uniqueId('trade')
   },
   get volume () {
     return self.amount * self.price

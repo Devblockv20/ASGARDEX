@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "formik": "^1.3.2",
     "lodash": "^4.17.11",
     "mobx": "^5.0.3",
     "mobx-react": "^5.2.5",
@@ -14,13 +15,14 @@
     "react-scripts-ts": "2.17.0",
     "styled-components": "^3.4.2",
     "thorchain-info-common": "^0.10.0",
-    "thorchain-wasm-client": "^0.0.3"
+    "thorchain-wasm-client": "^0.0.3",
+    "yup": "^0.26.6"
   },
   "scripts": {
     "lint": "tslint --project .",
-    "start": "REACT_APP_API_HOST='http://localhost:3001/api' REACT_APP_LCD_API_HOST='http://localhost:3001/api/lcd' react-scripts-ts start",
-    "build": "REACT_APP_API_HOST='https://thorchain.info/api' REACT_APP_LCD_API_HOST='https://thorchain.info/lcd' react-scripts-ts build",
-    "test": "REACT_APP_API_HOST='https://thorchain.info/api' REACT_APP_LCD_API_HOST='https://thorchain.info/lcd' react-scripts-ts test --env=jsdom",
+    "start": "REACT_APP_API_HOST='http://localhost:3001/api' REACT_APP_LCD_API_HOST='http://localhost:3001/api/lcd' REACT_APP_CHAIN_ID='test-chain-local' react-scripts-ts start",
+    "build": "REACT_APP_API_HOST='https://thorchain.info/api' REACT_APP_LCD_API_HOST='https://thorchain.info/lcd' REACT_APP_CHAIN_ID='genesis-beta' react-scripts-ts build",
+    "test": "REACT_APP_API_HOST='https://thorchain.info/api' REACT_APP_LCD_API_HOST='https://thorchain.info/lcd' REACT_APP_CHAIN_ID='genesis-beta' react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
@@ -32,6 +34,7 @@
     "@types/react-dom": "^16.0.9",
     "@types/react-router-dom": "^4.3.1",
     "@types/webassembly-web-api": "^0.0.1",
+    "@types/yup": "^0.26.2",
     "remotedev": "^0.2.7",
     "typescript": "^3.0.1"
   }

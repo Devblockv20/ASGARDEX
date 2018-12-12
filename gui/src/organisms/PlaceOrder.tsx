@@ -1,17 +1,17 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { LimitOrderForm } from './LimitOrderForm'
+import { LimitOrderFormContainer } from './LimitOrderForm/Container'
 
 export const PlaceOrder = () => (
   <>
     <Tabs><Tab><H2>Limit</H2></Tab></Tabs>
     <Row>
       <Col>
-        <LimitOrderForm buy={true} />
+        <LimitOrderFormContainer amountDenom="XMR" priceDenom="RUNE" buy={true} />
       </Col>
       <Divider />
       <Col>
-        <LimitOrderForm buy={false} />
+        <LimitOrderFormContainer amountDenom="XMR" priceDenom="RUNE" buy={false} />
       </Col>
     </Row>
   </>

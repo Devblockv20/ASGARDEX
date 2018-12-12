@@ -17,6 +17,10 @@ function rejectIfStatusNotOk(response: ResponseWithParsedBody) {
  * Helper to parse the response as JSON / binary (depending on content-type)
  */
 function parseBody(response: Response) {
+  if (response.status === 204) {
+    return Promise.resolve(response)
+  }
+
   return response.json().then((bodyParsed: any) => {
     const responseWithParsedBody: ResponseWithParsedBody = response
     responseWithParsedBody.bodyParsed = bodyParsed

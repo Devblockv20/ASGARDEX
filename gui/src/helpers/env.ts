@@ -1,5 +1,6 @@
 export const env = {
   REACT_APP_API_HOST: getEnvStr('REACT_APP_API_HOST'),
+  REACT_APP_CHAIN_ID: getEnvStr('REACT_APP_CHAIN_ID'),
   REACT_APP_LCD_API_HOST: getEnvStr('REACT_APP_LCD_API_HOST'),
 }
 

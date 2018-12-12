@@ -14,6 +14,7 @@ export const Pair = types.model({
   priceDenom: types.string,
   sellOrderbook: types.maybeNull(Orderbook),
   trades: types.maybeNull(types.array(Trade)),
+  tradesOwn: types.maybeNull(types.array(Trade)),
 })
 .actions(self => ({
   fetchOhlcv: flow(function* fetchOhlcv() {
@@ -50,6 +51,16 @@ export const Pair = types.model({
     } catch (error) {
       // tslint:disable-next-line:no-console
       console.error(`Failed to fetch trades ${self.amountDenom}/${self.priceDenom}`, error)
+    }
+  }),
+  fetchTradesOwn: flow(function* fetchTradesOwn(account: string) {
+    try {
+      const result: IExchangePair = yield http.get(
+        env.REACT_APP_API_HOST + `/exchange/trades/${self.priceDenom}/${self.amountDenom}?account=${account}`)
+      self.tradesOwn = cast(result)
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(`Failed to fetch own trades ${self.amountDenom}/${self.priceDenom}?account=${account}`, error)
     }
   }),
 }))

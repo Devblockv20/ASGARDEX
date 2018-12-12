@@ -1,11 +1,13 @@
 import { cast, flow, Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree'
+import * as moment from 'moment'
 import { downloadFile } from '../helpers/downloadFile'
 import { env } from '../helpers/env'
 import { http } from '../helpers/http'
-import { loadThorchainClient } from '../helpers/loadThorchainClient'
+import { IClient, loadThorchainClient } from '../helpers/loadThorchainClient'
 import { IPair, Pair } from './Pair'
 import { IPrice, Price } from './Price'
 import { TradingPool } from './TradingPool'
+import { UI } from './UI'
 import { Wallet } from './Wallet'
 
 export const Store = types.model({
@@ -14,13 +16,14 @@ export const Store = types.model({
   pairs: types.array(Pair),
   prices: types.array(Price),
   thorchainClientLoaded: types.boolean,
+  ui: UI,
   wallet: types.maybeNull(Wallet),
 })
 .actions(self => ({
   selectPair(pair: IPair) {
     self.pairSelected = cast(pair.id)
   },
-  createWallet: flow(function* fetchPrices() {
+  createWallet: flow(function* createWallet() {
     try {
       const { client } = yield loadThorchainClient()
       const walletString = yield client.createKey()
@@ -195,11 +198,51 @@ export const Store = types.model({
       console.error(`Failed to load up thorchain client`, error)
     }
   }),
+  signAndBroadcastExchangeCreateLimitOrderTx: flow(function* signAndBroadcastExchangeCreateLimitOrderTx(
+    kind: 'buy' | 'sell', amount: string, price: string,
+  ) {
+    const { wallet } = self
+    if (!wallet) {
+      throw new Error('Wallet not loaded')
+    }
+
+    const sender = wallet.address
+    const { accountNumber, sequence } = yield wallet.fetchLatestAccountNumberAndSequence()
+    const txContext = {
+      account_number: accountNumber,
+      chain_id: env.REACT_APP_CHAIN_ID,
+      fee: '',
+      gas: 20000,
+      memo: '',
+      priv_key: wallet.privateKey,
+      sequence,
+    }
+
+    const expiresAt = moment().add(1, 'day').toISOString()
+
+    const { client }: IClient = yield loadThorchainClient()
+
+    const res =
+      yield client.signAndBroadcastExchangeCreateLimitOrderTx(txContext, sender, kind, amount, price, expiresAt)
+
+    if (res.result.check_tx.code || res.result.deliver_tx.code) {
+      throw new Error(`Unknown error committing tx, result: ${JSON.stringify(res.result)}`)
+    }
+
+    return {
+      height: res.result.height,
+      isOk: true,
+    }
+  }),
   sub() {
     const fetch = () => {
       self.pairs.map(pair => pair.fetchOhlcv())
       self.pairSelected.fetchOrderboks()
       self.pairSelected.fetchTrades()
+      if (self.wallet) {
+        self.wallet.fetchCoins()
+        self.pairSelected.fetchTradesOwn(self.wallet.address)
+      }
     }
 
     setInterval(fetch, 1000)
