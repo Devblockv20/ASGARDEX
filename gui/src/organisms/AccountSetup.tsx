@@ -8,7 +8,8 @@ import { Header } from '../atoms/Header'
 import { Input } from '../atoms/Input'
 import { Label } from '../atoms/Label'
 import { Row } from '../atoms/Row'
-import { ICoin, IStore } from '../store/Store'
+import { ICoin } from '../store/Coin'
+import { IStore } from '../store/Store'
 
 interface IProps {
   store?: IStore
