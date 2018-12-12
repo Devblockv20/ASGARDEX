@@ -48,6 +48,10 @@ export class TVChartContainer extends React.PureComponent<Partial<IChartContaine
   private tvWidget: IChartingLibraryWidget | null = null
 
   public componentDidMount(): void {
+    if (!(window as any).Datafeeds) {
+      return
+    }
+
     const widgetOptions: ChartingLibraryWidgetOptions = {
       autosize: this.props.autosize,
       charts_storage_api_version: this.props.chartsStorageApiVersion,
