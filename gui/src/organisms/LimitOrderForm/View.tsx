@@ -56,14 +56,10 @@ export const LimitOrderFormView = observer(({
         <InputTickerAddition>{priceDenom}</InputTickerAddition>
         {errors.total && <FieldError>{errors.total}</FieldError>}
         <InputRadioButtonGroup>
-          <BtnPercentage type="button" disabled={status.is === 'loading'}
-            onClick={setPercentage(0.25)} active={isPercentage(0.25)}>25%</BtnPercentage>
-          <BtnPercentage type="button" disabled={status.is === 'loading'}
-            onClick={setPercentage(0.5)} active={isPercentage(0.5)}>50%</BtnPercentage>
-          <BtnPercentage type="button" disabled={status.is === 'loading'}
-            onClick={setPercentage(0.75)} active={isPercentage(0.75)}>75%</BtnPercentage>
-          <BtnPercentage type="button" disabled={status.is === 'loading'}
-            onClick={setPercentage(1)} active={isPercentage(1)}>100%</BtnPercentage>
+          {[0.25, 0.5, 0.75, 1].map(percentage =>
+            <BtnPercentage key={percentage} type="button" disabled={status.is === 'loading'}
+              onClick={setPercentage(percentage)} active={isPercentage(percentage)}>{percentage*100}%</BtnPercentage>,
+          )}
         </InputRadioButtonGroup>
       </ColInput>
     </FormRow>
