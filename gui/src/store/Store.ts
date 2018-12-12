@@ -357,15 +357,6 @@ export const Store = types.model({
       throw new Error(`Unknown error committing tx, result: ${JSON.stringify(res.result)}`)
     }
 
-    // update coins and orderbook
-    yield Promise.all([
-      wallet.fetchCoins(),
-      self.pairSelected.fetchOhlcv(),
-      self.pairSelected.fetchOrderboks(),
-      self.pairSelected.fetchTrades(),
-      self.pairSelected.fetchTradesOwn(wallet.address),
-    ])
-
     return {
       height: res.result.height,
       isOk: true,
@@ -377,6 +368,7 @@ export const Store = types.model({
       self.pairSelected.fetchOrderboks()
       self.pairSelected.fetchTrades()
       if (self.wallet) {
+        self.wallet.fetchCoins()
         self.pairSelected.fetchTradesOwn(self.wallet.address)
       }
     }

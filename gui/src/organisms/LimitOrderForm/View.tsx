@@ -80,8 +80,13 @@ export const LimitOrderFormView = observer(({
     {status.is === 'success' && (
       <Alert color="success">Your order has been committed at block height {status.height}</Alert>
     )}
-    {buy ? <ButtonBuy type="submit" disabled={status.is === 'loading'}>BUY {amountDenom}</ButtonBuy> :
-      <ButtonSell type="submit" disabled={status.is === 'loading'}>SELL {amountDenom}</ButtonSell>}
+    {buy ? (
+      <ButtonBuy type="submit" disabled={status.is === 'loading'}>
+        {status.is === 'loading' ? `BUYING ${amountDenom}...` : `BUY ${amountDenom}`}</ButtonBuy>
+    ) : (
+      <ButtonSell type="submit" disabled={status.is === 'loading'}>
+        {status.is === 'loading' ? `SELLING ${amountDenom}...` : `SELL ${amountDenom}`}</ButtonSell>
+    )}
   </Form>
 ))
 
