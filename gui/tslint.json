@@ -8,7 +8,9 @@
       "public/charting_library/**/*.js",
       "src/charting_library/**/*.js",
       "public/datafeeds/**/*.js",
-      "public/datafeeds/**/*.ts"
+      "public/datafeeds/**/*.ts",
+      "charting_library/**/*.js",
+      "charting_library/**/*.ts"
     ]
   },
   "rules": {
