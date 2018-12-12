@@ -1,0 +1,32 @@
+---
+- hosts: eip
+  gather_facts: yes
+  remote_user: ec2-user
+  become: yes
+  any_errors_fatal: true
+
+  vars:
+    # app
+    - app_express_port: 3001
+    - app_root_directory: "/srv/app"
+    - domain: "asgard.exchange"
+
+    # Certbot
+    - certbot_email: "hostmaster@asgard.exchange"
+    - certbot_domains:
+      - "asgard.exchange"
+      - "www.asgard.exchange"
+
+    # Nodejs
+    - nodejs_version: "8.x"
+    - nodejs_npm_global_packages:
+      - name: yarn
+
+  pre_tasks:
+    - name: Create app gui root directory
+      file: path={{ app_root_directory }}/gui state=directory recurse=yes
+
+  roles:
+    - nginx
+    - certbot
+    - node
