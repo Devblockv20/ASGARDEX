@@ -21,8 +21,8 @@
   "scripts": {
     "lint": "tslint --project .",
     "start": "REACT_APP_API_HOST='http://localhost:3001/api' REACT_APP_LCD_API_HOST='http://localhost:3001/api/lcd' REACT_APP_CHAIN_ID='test-chain-local' react-scripts-ts start",
-    "build": "REACT_APP_API_HOST='https://thorchain.info/api' REACT_APP_LCD_API_HOST='https://thorchain.info/lcd' REACT_APP_CHAIN_ID='genesis-beta' react-scripts-ts build",
-    "test": "REACT_APP_API_HOST='https://thorchain.info/api' REACT_APP_LCD_API_HOST='https://thorchain.info/lcd' REACT_APP_CHAIN_ID='genesis-beta' react-scripts-ts test --env=jsdom",
+    "build": "REACT_APP_API_HOST='https://thorchain.info/api' REACT_APP_LCD_API_HOST='https://thorchain.info/lcd' REACT_APP_CHAIN_ID='genesis-gamma' react-scripts-ts build",
+    "test": "REACT_APP_API_HOST='https://thorchain.info/api' REACT_APP_LCD_API_HOST='https://thorchain.info/lcd' REACT_APP_CHAIN_ID='genesis-gamma' react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
