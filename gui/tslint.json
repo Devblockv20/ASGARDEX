@@ -4,7 +4,13 @@
     "exclude": [
       "config/**/*.js",
       "node_modules/**/*.ts",
-      "coverage/lcov-report/*.js"
+      "coverage/lcov-report/*.js",
+      "public/charting_library/**/*.js",
+      "src/charting_library/**/*.js",
+      "public/datafeeds/**/*.js",
+      "public/datafeeds/**/*.ts",
+      "charting_library/**/*.js",
+      "charting_library/**/*.ts"
     ]
   },
   "rules": {
