@@ -7,7 +7,6 @@ import { getInUsd } from '../../helpers/getInUsd'
 import { IOrder } from '../../store/Order'
 import { IOrderbook } from '../../store/Orderbook'
 import { IPairOHLCV } from '../../store/PairOHLCV'
-import bars from './bars.svg'
 
 interface IProps {
   buyOrderbook: IOrderbook
@@ -25,9 +24,10 @@ export const OrderbookView = observer(({ buyOrderbook, sellOrderbook, ohlcv }: I
     <OrderLine key={order.order_id} order={order} />
   ))}
   <Live>
-    <Col><ValueColored change={ohlcv.change}>{formatNum(ohlcv.c, 2)}</ValueColored></Col>
+    <Col><ValueColored change={ohlcv.change}>
+      {formatNum(ohlcv.c, 2)} {ohlcv.change > 0 && '↑'}{ohlcv.change < 0 && '↓'}</ValueColored></Col>
     <Col>${formatNum(getInUsd(ohlcv.c), 2)}</Col>
-    <Col><Icon src={bars} /></Col>
+    <Col />
   </Live>
   {buyOrderbook.orders && buyOrderbook.orders.map(order => (
     <OrderLine key={order.order_id} order={order} />
@@ -82,9 +82,4 @@ const Live = styled.div`
     font-weight: 700;
     color: #00C486;
   }
-`
-
-const Icon = styled.img`
-  float: right;
-  margin-top: 5px;
 `

@@ -1,6 +1,7 @@
 import ThorchainWasmClient from 'thorchain-wasm-client'
 import { Client } from 'thorchain-wasm-client/dist/client/Client'
 import { Runner } from 'thorchain-wasm-client/dist/runner/Runner'
+import { env } from './env'
 
 declare var Go: any
 
@@ -27,7 +28,7 @@ export const loadThorchainClient = () => {
     return clientPromise
   }
 
-  clientPromise = ThorchainWasmClient(new Go()).then((loadedClient: IClient) => {
+  clientPromise = ThorchainWasmClient(new Go(), env.REACT_APP_THORCHAIND_HOST).then((loadedClient: IClient) => {
     client = loadedClient
     return client
   })
