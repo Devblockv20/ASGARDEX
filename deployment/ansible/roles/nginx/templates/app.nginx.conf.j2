@@ -69,6 +69,14 @@ server {
     include helpers/doCache.nginx.conf;
   }
 
+  # wasm modules
+  # Do not cache them, they do not contain hashes for now.
+  # The ?: prefix is a 'non-capturing' mark, meaning we do not require
+  # the pattern to be captured into $1 which should help improve performance
+  location ~* \.(?:wasm)$ {
+    include helpers/doNotCache.nginx.conf;
+  }
+
   location / {
     try_files /index.html =404;
     include helpers/doNotCache.nginx.conf;
