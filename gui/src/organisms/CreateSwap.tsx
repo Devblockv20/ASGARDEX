@@ -21,6 +21,7 @@ interface IState {
   selectedExchangePercentage: number,
   selectedExchangeToken: string | null,
   selectedReceiveToken: string | null,
+  swapError: string | null,
   tokenSearchTerm: string,
   totalExchangeAmount: number,
 }
@@ -33,6 +34,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
     selectedExchangePercentage: 100,
     selectedExchangeToken: null,
     selectedReceiveToken: null,
+    swapError: null,
     tokenSearchTerm: '',
     totalExchangeAmount: 0,
   }
@@ -40,19 +42,21 @@ export class CreateSwap extends React.Component<IProps, IState> {
   constructor(props:IProps) {
     super(props)
 
-    // Fetch token prices every 5 seconds
+    // Fetch token prices & CLPs every 5 seconds
     props.store!.fetchPrices()
-    setInterval(() => props.store!.fetchPrices(), 5000)
-
-    // Fetch CLPs
     props.store!.fetchCLPs()
+    setInterval(() => {
+      props.store!.fetchPrices()
+      props.store!.fetchCLPs()
+    }, 5000)
   }
 
   public handleExchangeTokenClick = (selectedExchangeToken:string, selectedExchangeAmount:number) => () => {
     this.setState({
       selectedExchangeAmount,
+      selectedExchangePercentage: 100,
       selectedExchangeToken,
-      totalExchangeAmount: selectedExchangeAmount * (this.state.selectedExchangePercentage / 100),
+      totalExchangeAmount: selectedExchangeAmount,
     })
   }
 
@@ -81,6 +85,39 @@ export class CreateSwap extends React.Component<IProps, IState> {
     })
   }
 
+  public handleSwapClick = () => {
+    const {
+      selectedExchangeToken,
+      selectedReceiveToken,
+      totalExchangeAmount,
+    } = this.state
+
+    const { store } = this.props
+
+    if (!selectedExchangeToken || !selectedReceiveToken || !totalExchangeAmount) {
+      return
+    }
+
+    return store!.signAndBroadcastClpTradeTx(
+      selectedExchangeToken,
+      selectedReceiveToken,
+      totalExchangeAmount,
+    ).then(() => {
+      const { wallet } = store!
+
+      if (!wallet) {
+        return
+      }
+
+      // Refresh coins in wallet
+      wallet.fetchCoins()
+    }).catch((err) => {
+      this.setState({
+        swapError: err.message,
+      })
+    })
+  }
+
   public render() {
     const {
       selectedExchangePercentage,
@@ -89,6 +126,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
       tokenSearchTerm,
       totalExchangeAmount,
       selectedExchangeAmount,
+      swapError,
     } = this.state
 
     const { getTokenPriceInUsdt, getTokenExchangeRate, clps, wallet } = this.props.store!
@@ -121,7 +159,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
     const maxExchangeAmount = selectedExchangeAmount || 0
 
     return (
-      <>
+      <React.Fragment>
       <Row>
         <Col>
           <WalletWrapper>
@@ -214,7 +252,18 @@ export class CreateSwap extends React.Component<IProps, IState> {
               {(!selectedExchangeToken || !selectedReceiveToken) && (
                 <SummaryWrapper/>
               )}
-              <SwapButton primary={true} disabled={(!selectedExchangeToken || !selectedReceiveToken)}>Swap</SwapButton>
+              {swapError && (
+                <SwapError>
+                  {swapError}
+                </SwapError>
+              )}
+              <SwapButton
+                primary={true}
+                disabled={(!selectedExchangeToken || !selectedReceiveToken)}
+                onClick={this.handleSwapClick}
+              >
+                Swap
+              </SwapButton>
               <Disclaimer>
                 Swaps are executed at the best possible price against both the CLP and the order book.
               </Disclaimer>
@@ -239,7 +288,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
           </TokensWrapper>
         </Col>
       </Row>
-      </>
+      </React.Fragment>
     )
   }
 }
@@ -325,4 +374,12 @@ const Disclaimer = styled.div`
   font-size: 12px;
   color: #4e6376;
   margin-top: 30px;
+`
+
+const SwapError = styled.div`
+  text-align: center;
+  font-size: 14px;
+  color: #ab4242;
+  margin-top: 30px;
+  margin-bottom: 0;
 `

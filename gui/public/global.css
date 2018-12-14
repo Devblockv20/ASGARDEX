@@ -1,7 +1,0 @@
-/* Some globally-set CSS for font-display purposes */
-body {
-    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
