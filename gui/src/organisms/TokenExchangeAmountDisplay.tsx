@@ -76,12 +76,12 @@ export class TokenExchangeAmountDisplay extends React.Component<IProps, IState> 
     totalExchangeAmount = Math.min(Number.isNaN(totalExchangeAmount) ? 0 : totalExchangeAmount, maxExchangeAmount)
     const selectedPercentage = Math.round((totalExchangeAmount / maxExchangeAmount) * 100)
 
-    if (onTotalAmountChange) {
-      onTotalAmountChange(totalExchangeAmount)
-    }
-
     if (onPercentageSelectClick) {
       onPercentageSelectClick(selectedPercentage)
+    }
+
+    if (onTotalAmountChange) {
+      onTotalAmountChange(totalExchangeAmount)
     }
 
     this.setState({

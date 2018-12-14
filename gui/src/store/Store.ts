@@ -198,6 +198,39 @@ export const Store = types.model({
       console.error(`Failed to load up thorchain client`, error)
     }
   }),
+  signAndBroadcastClpTradeTx: flow(function* signAndBroadcastClpTradeTx(
+    fromTicker: string, toTicker: string, fromAmount: number,
+  ) {
+    const { wallet } = self
+    if (!wallet) {
+      throw new Error('Wallet not loaded')
+    }
+
+    const sender = wallet.address
+    const { accountNumber, sequence } = yield wallet.fetchLatestAccountNumberAndSequence()
+    const txContext = {
+      account_number: accountNumber,
+      chain_id: env.REACT_APP_CHAIN_ID,
+      fee: '',
+      gas: 20000,
+      memo: '',
+      priv_key: wallet.privateKey,
+      sequence,
+    }
+
+    const { client }: IClient = yield loadThorchainClient()
+
+    const res = yield client.signAndBroadcastClpTradeTx(txContext, sender, fromTicker, toTicker, fromAmount)
+
+    if (res.result.check_tx.code || res.result.deliver_tx.code) {
+      throw new Error(`Unknown error committing tx, result: ${JSON.stringify(res.result)}`)
+    }
+
+    return {
+      height: res.result.height,
+      isOk: true,
+    }
+  }),
   signAndBroadcastExchangeCreateLimitOrderTx: flow(function* signAndBroadcastExchangeCreateLimitOrderTx(
     kind: 'buy' | 'sell', amount: string, price: string,
   ) {
