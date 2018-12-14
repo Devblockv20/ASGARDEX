@@ -157,34 +157,27 @@ export const Store = types.model({
   },
   getTokenPriceInUsdt(amount: number, denom: string) {
     const pricesData = self.prices
+    const CLPs = self.clps
 
-    if (!pricesData) {
+    if (!pricesData || !CLPs) {
       return null
     }
 
-    let BTCtoUSDT
-    let denomToBTC
-
-    if (denom === 'USDT') {
-      return amount
-    }
+    // - Get ETH price in USDT from Binance
+    // - Set RUNE price in USDT from ETH:RUNE CLP
+    // - Set all other prices in RUNE and USDT from TOKEN:RUNE CLP
+    const DenomToRUNE = this.getTokenExchangeRate(denom, 'RUNE')
+    const RUNEtoETH = this.getTokenExchangeRate('RUNE', 'ETH')
+    let ETHtoUSDT
 
     for (const price of pricesData) {
-      if (price.symbol === `${denom}USDT`) {
-        return amount * price.price
-      }
-
-      if (price.symbol === `${denom}BTC`) {
-        denomToBTC = price.price
-      }
-
-      if (price.symbol === 'BTCUSDT') {
-        BTCtoUSDT = price.price
+      if (price.symbol === `ETHUSDT`) {
+        ETHtoUSDT = price.price
       }
     }
 
-    if (BTCtoUSDT && denomToBTC) {
-      return amount * denomToBTC * BTCtoUSDT
+    if (RUNEtoETH && ETHtoUSDT && DenomToRUNE) {
+      return amount * DenomToRUNE * RUNEtoETH * ETHtoUSDT
     }
 
     return null
