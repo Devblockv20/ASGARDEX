@@ -110,7 +110,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
       }
 
       // Refresh coins in wallet
-      wallet.fetchCoins()
+      wallet.fetchCoinsAccountNumberAndSequence()
     }).catch((err) => {
       this.setState({
         swapError: err.message,
