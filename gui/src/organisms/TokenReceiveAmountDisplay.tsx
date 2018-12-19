@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
 import { Coin } from '../atoms/Coin'
+import { screenSizes } from '../helpers/theme'
 import tokens from '../helpers/tokens'
 
 interface IProps {
@@ -67,10 +68,13 @@ export const TokenReceiveAmountDisplay = ({
 
 const Wrapper = styled.div`
   min-height: 250px;
-  min-width: 320px;
+  width: 320px;
   margin-top: 30px;
   display: block;
   position: relative;
+  @media (max-width: ${screenSizes.massive}) {
+    width: 270px;
+  }
 `
 
 const TokenInfoWrapper = styled.div`
@@ -86,6 +90,10 @@ const TokenInfo = styled.div`
   display: inline-block;
   margin-left: 20px;
   vertical-align: middle;
+  width: 220px;
+  @media (max-width: ${screenSizes.massive}) {
+    width: 170px;
+  }
 `
 
 const TokenName = styled.div`
