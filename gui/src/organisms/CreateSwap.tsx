@@ -116,7 +116,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
       }
 
       // Refresh coins in wallet
-      return wallet.fetchCoins() as any
+      return wallet.fetchCoinsAccountNumberAndSequence() as any
     }).then(() => {
       this.setState({
         isSwapping: false,

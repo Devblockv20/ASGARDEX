@@ -30,10 +30,12 @@ export const Store = types.model({
       const wallet = JSON.parse(String(walletString))
 
       self.wallet = cast({
+        accountNumber: null,
         address: wallet.addr,
         coins: [],
         privateKey: wallet.priv,
         publicKey: wallet.pub,
+        sequence: null,
       })
 
       // Base-64 encode the data
@@ -68,10 +70,12 @@ export const Store = types.model({
       const wallet = JSON.parse(atob(walletFileContents))
 
       self.wallet = cast({
+        accountNumber: null,
         address: wallet.addr,
         coins: [],
         privateKey: wallet.priv,
         publicKey: wallet.pub,
+        sequence: null,
       })
 
       // Store the wallet locally if it isn't already
@@ -80,7 +84,7 @@ export const Store = types.model({
       }
 
       if (self.wallet) {
-        self.wallet.fetchCoins()
+        self.wallet.fetchCoinsAccountNumberAndSequence()
       }
     } catch (error) {
       // tslint:disable-next-line:no-console
@@ -200,15 +204,14 @@ export const Store = types.model({
     }
 
     const sender = wallet.address
-    const { accountNumber, sequence } = yield wallet.fetchLatestAccountNumberAndSequence()
     const txContext = {
-      account_number: accountNumber,
+      account_number: wallet.accountNumber || 0,
       chain_id: env.REACT_APP_CHAIN_ID,
       fee: '',
       gas: 30000,
       memo: '',
       priv_key: wallet.privateKey,
-      sequence,
+      sequence: wallet.nextSequence(),
     }
 
     const { client }: IClient = yield loadThorchainClient()
@@ -216,6 +219,7 @@ export const Store = types.model({
     const res = yield client.signAndBroadcastClpTradeTx(txContext, sender, fromTicker, toTicker, fromAmount)
 
     if (res.result.check_tx.code || res.result.deliver_tx.code) {
+      wallet.decreaseSequence()
       throw new Error(`Unknown error committing tx, result: ${JSON.stringify(res.result)}`)
     }
 
@@ -233,15 +237,14 @@ export const Store = types.model({
     }
 
     const sender = wallet.address
-    const { accountNumber, sequence } = yield wallet.fetchLatestAccountNumberAndSequence()
     const txContext = {
-      account_number: accountNumber,
+      account_number: wallet.accountNumber || 0,
       chain_id: env.REACT_APP_CHAIN_ID,
       fee: '',
       gas: 30000,
       memo: '',
       priv_key: wallet.privateKey,
-      sequence,
+      sequence: wallet.nextSequence(),
     }
 
     const expiresAt = moment().add(1, 'day').toISOString()
@@ -252,6 +255,7 @@ export const Store = types.model({
       yield client.signAndBroadcastExchangeCreateLimitOrderTx(txContext, sender, kind, amount, price, expiresAt)
 
     if (res.result.check_tx.code || res.result.deliver_tx.code) {
+      wallet.decreaseSequence()
       throw new Error(`Unknown error committing tx, result: ${JSON.stringify(res.result)}`)
     }
 
@@ -266,7 +270,7 @@ export const Store = types.model({
       self.pairSelected.fetchOrderboks()
       self.pairSelected.fetchTrades()
       if (self.wallet) {
-        self.wallet.fetchCoins()
+        self.wallet.fetchCoinsAccountNumberAndSequence()
         self.pairSelected.fetchTradesOwn(self.wallet.address)
       }
     }
