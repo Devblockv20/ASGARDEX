@@ -17,6 +17,7 @@ interface IProps {
 }
 
 interface IState {
+  isSwapping: boolean,
   selectedExchangeAmount: number | null,
   selectedExchangePercentage: number,
   selectedExchangeToken: string | null,
@@ -30,6 +31,7 @@ interface IState {
 @observer
 export class CreateSwap extends React.Component<IProps, IState> {
   public state = {
+    isSwapping: false,
     selectedExchangeAmount: null,
     selectedExchangePercentage: 100,
     selectedExchangeToken: null,
@@ -98,6 +100,10 @@ export class CreateSwap extends React.Component<IProps, IState> {
       return
     }
 
+    this.setState({
+      isSwapping: true,
+    })
+
     return store!.signAndBroadcastClpTradeTx(
       selectedExchangeToken,
       selectedReceiveToken,
@@ -110,9 +116,14 @@ export class CreateSwap extends React.Component<IProps, IState> {
       }
 
       // Refresh coins in wallet
-      wallet.fetchCoinsAccountNumberAndSequence()
+      return wallet.fetchCoinsAccountNumberAndSequence() as any
+    }).then(() => {
+      this.setState({
+        isSwapping: false,
+      })
     }).catch((err) => {
       this.setState({
+        isSwapping: false,
         swapError: err.message,
       })
     })
@@ -120,6 +131,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
 
   public render() {
     const {
+      isSwapping,
       selectedExchangePercentage,
       selectedExchangeToken,
       selectedReceiveToken,
@@ -259,10 +271,10 @@ export class CreateSwap extends React.Component<IProps, IState> {
               )}
               <SwapButton
                 primary={true}
-                disabled={(!selectedExchangeToken || !selectedReceiveToken)}
+                disabled={(!selectedExchangeToken || !selectedReceiveToken || isSwapping)}
                 onClick={this.handleSwapClick}
               >
-                Swap
+                {isSwapping ? 'Swapping...' : 'Swap'}
               </SwapButton>
               <Disclaimer>
                 Swaps are executed at the best possible price against both the CLP and the order book.
