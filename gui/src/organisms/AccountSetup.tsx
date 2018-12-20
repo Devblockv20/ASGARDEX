@@ -15,20 +15,30 @@ interface IProps {
   store?: IStore
 }
 
+interface IState {
+  privateKey: string
+}
+
 @inject('store')
 @observer
-export class AccountSetup extends React.Component<IProps, {}> {
+export class AccountSetup extends React.Component<IProps, IState> {
+
+  public state = {
+    privateKey: '',
+  }
 
   private fileInputRef: any
 
   public handleCreateAccountClick = () => {
     const { store } = this.props
     store!.createWallet()
+    this.clearPrivateKeyState()
   }
 
   public handleForgetAccountClick = () => {
     const { store } = this.props
     store!.forgetWallet()
+    this.clearPrivateKeyState()
   }
 
   public handleSelectFileClick = () => {
@@ -39,22 +49,45 @@ export class AccountSetup extends React.Component<IProps, {}> {
     this.fileInputRef.click()
   }
 
-  public handleFileUpload = (e: any) => {
-    const file = e.target.files[0]
+  public handleFileUpload = (uploadEvent: any) => {
+    const file = uploadEvent.target.files[0]
     const reader = new FileReader()
 
     reader.onload = (readEvent: any) => {
       const walletString = readEvent.target.result
       const { store } = this.props
       store!.loadWallet(walletString)
+      this.clearPrivateKeyState()
     }
 
     reader.readAsText(file)
   }
 
+  public handleLoadPrivateKey = () => {
+    const { privateKey } = this.state
+    const { store } = this.props
+
+    store!.loadWalletFromPrivateKey(privateKey)
+  }
+
+  public handlePrivateKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const privateKey = event.target.value
+
+    this.setState({
+      privateKey,
+    })
+  }
+
+  public clearPrivateKeyState = () => {
+    this.setState({
+      privateKey: '',
+    })
+  }
+
   public render() {
     const { store } = this.props
     const wallet = store!.wallet
+    const walletErrorMessage = store!.ui.walletErrorMessage
 
     return (
       <Wrapper>
@@ -62,8 +95,12 @@ export class AccountSetup extends React.Component<IProps, {}> {
         <Row>
           <Col>
             <Label>Token owner</Label>
-            {/* Note: disabled for now, as we don't have a function to turn priv key -> pub key & address */}
-            <Input placeholder="Enter your private key (disabled for now)" disabled={true}/>
+            <Input
+              placeholder="Enter your private key"
+              value={wallet ? wallet.privateKey : this.state.privateKey}
+              disabled={Boolean(wallet)}
+              onChange={this.handlePrivateKeyChange}
+            />
             {!wallet && (
               <React.Fragment>
                 <Label>or select wallet file</Label>
@@ -75,6 +112,9 @@ export class AccountSetup extends React.Component<IProps, {}> {
                   ref={(fileInput) => this.fileInputRef = fileInput}
                 />
               </React.Fragment>
+            )}
+            {walletErrorMessage && (
+              <WalletError>{walletErrorMessage}</WalletError>
             )}
             <Row style={{ marginTop: 20 }}>
               <Col style={{ margin: 0 }}>
@@ -101,7 +141,10 @@ export class AccountSetup extends React.Component<IProps, {}> {
           <Col>
             <Buttons>
               {!wallet && (
-                <Button primary={true} onClick={this.handleCreateAccountClick}>Create account</Button>
+                <Button onClick={this.handleLoadPrivateKey}>Add private key</Button>
+              )}
+              {!wallet && (
+                <Button primary={true} onClick={this.handleCreateAccountClick}>Create new wallet</Button>
               )}
               {wallet && (
                 <Button onClick={this.handleForgetAccountClick}>Forget account</Button>
@@ -130,5 +173,12 @@ const Text = styled.p`
   color: #fff;
   margin-top: 0;
   margin-bottom: 10px;
+`
+
+const WalletError = styled.div`
+  font-size: 14px;
+  color: #ab4242;
+  margin-bottom: 10px;
+  max-width: 400px;
 `
 
