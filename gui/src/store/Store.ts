@@ -25,9 +25,10 @@ export const Store = types.model({
   },
   createWallet: flow(function* createWallet() {
     try {
+      self.ui.clearWalletError()
+
       const { client } = yield loadThorchainClient()
-      const walletString = yield client.createKey()
-      const wallet = JSON.parse(String(walletString))
+      const wallet = yield client.createKey()
 
       self.wallet = cast({
         accountNumber: null,
@@ -39,21 +40,25 @@ export const Store = types.model({
       })
 
       // Base-64 encode the data
-      const walletFileContents = btoa(String(walletString))
+      const walletFileContents = btoa(JSON.stringify(wallet))
 
       // Store & download new wallet file
       window.localStorage.setItem('key.thorchain', walletFileContents)
       downloadFile('key.thorchain', walletFileContents)
     } catch (error) {
+      self.ui.setWalletError('Failed to create wallet')
       // tslint:disable-next-line:no-console
       console.error(`Failed to create wallet`, error)
     }
   }),
   forgetWallet() {
+    self.ui.clearWalletError()
     window.localStorage.removeItem('key.thorchain')
     self.wallet = null
   },
   loadWallet(walletFileContents?: string | null) {
+    self.ui.clearWalletError()
+
     let isStored = false
 
     // Load wallet from local storage
@@ -87,8 +92,9 @@ export const Store = types.model({
         self.wallet.fetchCoinsAccountNumberAndSequence()
       }
     } catch (error) {
+      self.ui.setWalletError('Failed to load wallet')
       // tslint:disable-next-line:no-console
-      console.error(`Failed to load wallet from localstorage`, error)
+      console.error(`Failed to load wallet`, error)
     }
   },
   fetchCLPs: flow(function* fetchCLPs() {
@@ -286,6 +292,21 @@ export const Store = types.model({
     self.loadClient()
     self.loadWallet()
   },
+  loadWalletFromPrivateKey: flow(function* loadWalletFromPrivateKey(privateKey: string) {
+    // Note: Need to place this function here so that TypeScript doesn't complain
+    // when we reference another action e.g. self.loadWallet
+    try {
+      self.ui.clearWalletError()
+      const { client } = yield loadThorchainClient()
+      const wallet = yield client.getPubAndAddrFromPrivKey(privateKey)
+      const walletFileContents = btoa(JSON.stringify(wallet))
+      self.loadWallet(walletFileContents)
+    } catch (error) {
+      self.ui.setWalletError('Failed to load wallet from private key')
+      // tslint:disable-next-line:no-console
+      console.error('Failed to load wallet from private key', error)
+    }
+  }),
 }))
 
 export interface IStore extends Instance<typeof Store> {}

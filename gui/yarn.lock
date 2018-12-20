@@ -6976,9 +6976,9 @@ thorchain-info-common@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/thorchain-info-common/-/thorchain-info-common-0.10.0.tgz#d4157ad215a708ed4b6cabd82bca3da8087948b8"
 
-thorchain-wasm-client@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/thorchain-wasm-client/-/thorchain-wasm-client-0.0.3.tgz#f165ec124f09412927a25ff2516c0e72c7ee4b23"
+thorchain-wasm-client@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/thorchain-wasm-client/-/thorchain-wasm-client-0.0.4.tgz#e71c3645c4476c9613ca26dbf4f9a71ef9a8da54"
 
 throat@^4.0.0:
   version "4.1.0"
