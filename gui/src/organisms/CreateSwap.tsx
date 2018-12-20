@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Button } from '../atoms/Button'
 import { Coin } from '../atoms/Coin'
 import { SearchInput } from '../atoms/SearchInput'
+import { screenSizes } from '../helpers/theme'
 import tokens from '../helpers/tokens'
 import swapDivider from '../images/swap_divider.png'
 import swapDivider2x from '../images/swap_divider@2x.png'
@@ -349,6 +350,13 @@ const ImgDivider = styled.img`
   margin-left: auto;
   margin-right: auto;
   margin-top: 40px;
+  
+  @media (max-width: ${screenSizes.massive}) {
+    width: 200px;
+  }
+  @media (max-width: ${screenSizes.huge}) {
+    display: none;
+  }
 `
 
 const CoinWrapper = styled.div`
@@ -371,6 +379,9 @@ const EmptyState = styled.div`
   text-align: center;
   padding-top: 75px;
   font-size: 18px;
+  @media (max-width: ${screenSizes.massive}) {
+    width: 270px;
+  }
 `
 
 const SwapButton = styled(Button)`
@@ -394,4 +405,7 @@ const SwapError = styled.div`
   color: #ab4242;
   margin-top: 30px;
   margin-bottom: 0;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 `

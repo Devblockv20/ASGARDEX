@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
+import { screenSizes } from '../helpers/theme'
 import searchIcon from '../images/search_icon.png'
 import { Input } from './Input'
 
@@ -19,6 +20,9 @@ const SearchEl = styled(Input)`
   max-width: 200px;
   margin-bottom: 15px;
   padding-left: 35px;
+  @media (max-width: ${screenSizes.massive}) {
+    max-width: 150px;
+  }
 `
 
 const SearchWrapper = styled.div`
