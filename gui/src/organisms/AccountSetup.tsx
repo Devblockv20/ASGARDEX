@@ -2,6 +2,7 @@ import { inject, observer } from 'mobx-react'
 import * as React from 'react'
 import styled from 'styled-components'
 import { formatNum } from 'thorchain-info-common/build/helpers/formatNum'
+import { Alert } from '../atoms/Alert'
 import { Button } from '../atoms/Button'
 import { Col } from '../atoms/Col'
 import { Header } from '../atoms/Header'
@@ -16,7 +17,8 @@ interface IProps {
 }
 
 interface IState {
-  privateKey: string
+  privateKey: string,
+  walletWasCreated: boolean
 }
 
 @inject('store')
@@ -25,6 +27,7 @@ export class AccountSetup extends React.Component<IProps, IState> {
 
   public state = {
     privateKey: '',
+    walletWasCreated: false,
   }
 
   private fileInputRef: any
@@ -33,6 +36,9 @@ export class AccountSetup extends React.Component<IProps, IState> {
     const { store } = this.props
     store!.createWallet()
     this.clearPrivateKeyState()
+    this.setState({
+      walletWasCreated: true,
+    })
   }
 
   public handleForgetAccountClick = () => {
@@ -84,8 +90,15 @@ export class AccountSetup extends React.Component<IProps, IState> {
     })
   }
 
+  public dismissPrivateKeyMessage = () => {
+    this.setState({
+      walletWasCreated: false,
+    })
+  }
+
   public render() {
     const { store } = this.props
+    const { walletWasCreated } = this.state
     const wallet = store!.wallet
     const walletErrorMessage = store!.ui.walletErrorMessage
 
@@ -95,9 +108,18 @@ export class AccountSetup extends React.Component<IProps, IState> {
         <Row>
           <Col>
             <Label>Token owner</Label>
+            {wallet && walletWasCreated && (
+              <Alert
+                color="success"
+                style={{ marginTop: 0, marginBottom: 20 }}
+                onDismiss={this.dismissPrivateKeyMessage}
+              >
+                Private key: {wallet.privateKey}
+              </Alert>
+            )}
             <Input
               placeholder="Enter your private key"
-              value={wallet ? wallet.privateKey : this.state.privateKey}
+              value={wallet ? '(Private key hidden)' : this.state.privateKey}
               disabled={Boolean(wallet)}
               onChange={this.handlePrivateKeyChange}
             />

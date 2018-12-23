@@ -1,6 +1,7 @@
 import { inject, observer } from 'mobx-react'
 import * as React from 'react'
 import styled from 'styled-components'
+import { Alert } from '../atoms/Alert'
 import { Button } from '../atoms/Button'
 import { Coin } from '../atoms/Coin'
 import { SearchInput } from '../atoms/SearchInput'
@@ -23,6 +24,7 @@ interface IState {
   selectedExchangePercentage: number,
   selectedExchangeToken: string | null,
   selectedReceiveToken: string | null,
+  showSwapSuccess: boolean,
   swapError: string | null,
   tokenSearchTerm: string,
   totalExchangeAmount: number,
@@ -37,6 +39,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
     selectedExchangePercentage: 100,
     selectedExchangeToken: null,
     selectedReceiveToken: null,
+    showSwapSuccess: false,
     swapError: null,
     tokenSearchTerm: '',
     totalExchangeAmount: 0,
@@ -88,6 +91,12 @@ export class CreateSwap extends React.Component<IProps, IState> {
     })
   }
 
+  public handleSwapSuccessDismiss = () => {
+    this.setState({
+      showSwapSuccess: false,
+    })
+  }
+
   public handleSwapClick = () => {
     const {
       selectedExchangeToken,
@@ -121,6 +130,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
     }).then(() => {
       this.setState({
         isSwapping: false,
+        showSwapSuccess: true,
       })
     }).catch((err) => {
       this.setState({
@@ -136,6 +146,7 @@ export class CreateSwap extends React.Component<IProps, IState> {
       selectedExchangePercentage,
       selectedExchangeToken,
       selectedReceiveToken,
+      showSwapSuccess,
       tokenSearchTerm,
       totalExchangeAmount,
       selectedExchangeAmount,
@@ -269,6 +280,11 @@ export class CreateSwap extends React.Component<IProps, IState> {
                 <SwapError>
                   {swapError}
                 </SwapError>
+              )}
+              {showSwapSuccess && (
+                <Alert color="success" onDismiss={this.handleSwapSuccessDismiss}>
+                  Swap executed successfully.
+                </Alert>
               )}
               <SwapButton
                 primary={true}
